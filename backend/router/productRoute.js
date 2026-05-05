@@ -1,7 +1,6 @@
 import express from "express";
 import multer from "multer";
 import {Product} from "../models/product.model.js";
-import mongoose from "mongoose";
 import { createProduct, deleteProduct, getAllProducts, getproductById, getProducts ,updateProduct } from "../Controller/productController.js";
 
 const router = express.Router();

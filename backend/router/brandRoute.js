@@ -1,6 +1,5 @@
 
 import express from "express";
-import mongoose from "mongoose";
 import multer from "multer";
 import {Product} from "../models/product.model.js";
 import { uploadToCloudinary } from "../config/Cloudinary.js";
@@ -85,28 +84,28 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 🔹 GET ALL PRODUCTS OF A SPECIFIC BRAND
-router.get("/:brandId/product", async (req, res) => {
-  try {
-    const { brandId } = req.params;
+// // 🔹 GET ALL PRODUCTS OF A SPECIFIC BRAND
+// router.get("/:brandId/product", async (req, res) => {
+//   try {
+//     const { brandId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(brandId)) {
-      return res.status(400).json({ success: false, message: "Invalid brand ID" });
-    }
+//     if (!mongoose.Types.ObjectId.isValid(brandId)) {
+//       return res.status(400).json({ success: false, message: "Invalid brand ID" });
+//     }
 
-    const products = await Product.find({ brand: brandId })
-      .populate("brand", "name")
-      .populate("category", "name");
+//     const products = await Product.find({ brand: brandId })
+//       .populate("brand", "name")
+//       .populate("category", "name");
 
-    res.status(200).json({
-      success: true,
-      count: products.length,
-      products,
-    });
-  } catch (error) {
-    console.error("Error fetching brand products:", error);
-    res.status(500).json({ success: false, message: "Server error while fetching products" });
-  }
-});
+//     res.status(200).json({
+//       success: true,
+//       count: products.length,
+//       products,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching brand products:", error);
+//     res.status(500).json({ success: false, message: "Server error while fetching products" });
+//   }
+// });
 
 export default router;
