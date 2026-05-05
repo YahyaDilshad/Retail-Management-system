@@ -1,7 +1,7 @@
 import { uploadToCloudinary } from "../config/Cloudinary.js";
 import { Staff } from "../models/Staff.model.js";
 import { User } from "../models/user.model.js";
-import {newStaff} from '../Services/staff.services.js'
+import {newStaff} from '../services/staff.services.js'
 
 
 export const CreateStaff = async (req, res) => {

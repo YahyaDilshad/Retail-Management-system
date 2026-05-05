@@ -1,6 +1,6 @@
 import Order from "../models/order.model.js";
 import User from "../models/user.model.js"; // Import User model for admin functions
-import { SendOrderNotification } from "../services/pushnotification.service.js";
+// import { SendOrderNotification } from "../services/pushnotification.service.js";
 
 
 // ✅ Get all admin users and check is admin active or not in sendNewOrderAlertToAdmins function  
