@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
-
+import dotenv from "dotenv";
+dotenv.config();
 // Agar DATABASE_URL mojood hai to wo use kare, warna local settings
 export const sequelize = process.env.DB_URI 
   ? new Sequelize(process.env.DB_URI, {
