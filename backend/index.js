@@ -5,11 +5,11 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import categoryRoutes from "../router/categoryRoute.js";
-import brandRoutes from "../router/brandRoute.js";
-import productRoutes from "../router/productRoute.js";
-import authuser from "../router/userRouter.js";
-import staff from "../router/Staff.router.js";
+import categoryRoutes from "./router/categoryRoute.js";
+import brandRoutes from "./router/brandRoute.js";
+import productRoutes from "./router/productRoute.js";
+import authuser from "./router/userRouter.js";
+import staff from "./router/Staff.router.js";
 
 const app = express();
 
@@ -17,7 +17,7 @@ app.use(cookieParser());
 
 // Production mein origin ko broad rakhne ke bajaye frontend URL dena behtar hai
 app.use(cors({
-  origin: process.env.FRONTEND_URL || true, 
+  origin:  true, 
   credentials: true
 }));
 
