@@ -17,7 +17,7 @@ app.use(cookieParser());
 
 app.use(cors({
   origin:"https://retail-management-system-imno-5rbaytjee-yahyadilshads-projects.vercel.app", 
-  credentials: true
+  credentials: true 
 }));
 
 app.use(express.json());
