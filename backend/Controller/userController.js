@@ -33,8 +33,8 @@ export const registerUser = async (req, res) => {
     
     res.cookie("token", token ,{
       httpOnly : true,
-      secure : process.env.NODE_ENV === "production" || process.env.NODE_ENV === "development",
-      sameSite : "strict",
+      secure : true,
+      sameSite : "none",
     })
     console.log("User registered successfully:", user)
     return res.status(201).json({ success: true, message: "User registered successfully", user });
