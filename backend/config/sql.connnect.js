@@ -7,6 +7,7 @@ export const sequelize = process.env.DB_URI
       dialect: "mysql",
       dialectOptions: {
         ssl: {
+          require : true,
           rejectUnauthorized: false}
       }
     })
