@@ -15,8 +15,9 @@ const app = express();
 
 app.use(cookieParser());
 
+// Production mein origin ko broad rakhne ke bajaye frontend URL dena behtar hai
 app.use(cors({
-  origin: true,
+  origin: process.env.FRONTEND_URL || true, 
   credentials: true
 }));
 
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.json({ status: "Backend running" });
+  res.json({ status: "Backend running successfully on Railway" });
 });
 
 app.use("/api/auth", authuser);
@@ -33,10 +34,16 @@ app.use("/api/staff", staff);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/brands", brandRoutes);
 
-// global error handler (IMPORTANT)
+// global error handler
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ message: "Internal Server Error" + err.message });
+  res.status(500).json({ message: "Internal Server Error: " + err.message });
+});
+
+// >>> RAILWAY KE LIYE YEH PORT SETTING LAZMI HAI <<<
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 export default app;
