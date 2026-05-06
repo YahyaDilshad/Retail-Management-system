@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-
-import useauthstore from "../store/authstore";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Home } from "lucide-react";
@@ -22,6 +20,7 @@ const SignUp = () => {
     mutationFn : async(payload)=>{
       console.log("User SignUp" , payload)
       const res = await axiosInstance.post("/auth/signup", payload)
+      console.log("hiting api",res)
     },onSuccess: ()=>{
         queryClient.invalidateQueries(["authUser"])      
     }
