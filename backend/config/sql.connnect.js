@@ -22,6 +22,8 @@ export const sequelize = process.env.DB_URI
       }
     );
 
+  console.log("DB_USER" , process.env.DB_USER)
+  console.log("DB_PASSWORD" , process.env.DB_PASSWORD)
 const start = async () => {
   try {
     await sequelize.authenticate();
