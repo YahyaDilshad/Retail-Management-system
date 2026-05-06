@@ -17,7 +17,7 @@ app.use(cookieParser());
 
 // Production mein origin ko broad rakhne ke bajaye frontend URL dena behtar hai
 app.use(cors({
-  origin:  true, 
+  origin:"https://retail-management-system-imno.vercel.app/", 
   credentials: true
 }));
 
