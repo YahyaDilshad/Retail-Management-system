@@ -91,7 +91,7 @@ const SignUp = () => {
                 }
                 value={Formdata.identifier}
                 type="text"
-                placeholder="Email/Password"
+                placeholder="Email/Username"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-[#20B0A4]"
               />
             </div>
