@@ -11,7 +11,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import ProductPage from './pages/ProductPage.jsx';
 import SignUp from './pages/signUp.jsx'
 import Sidebar from './components/sideBar.jsx';
-import Signinpage from './pages/Signin.jsx';
+
 import Header from './components/Header.jsx';
 import { LoaderIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -54,19 +54,16 @@ const App = () => {
         
         <Routes>
            
-          <Route path='/admin/signin' element={!user ? <Signinpage /> : <Navigate to='/admin/dashboard' />} />
           <Route path='/admin/signUp' element={!user ? <SignUp /> : <Navigate to='/admin/dashboard' />} />
 
           {/* Dashboard /  Home - Protect them */}
-          <Route path='/admin' element={user ? <Home /> : <Navigate to='/admin/signin' />} />
           <Route path='/admin/products' element={user ? <ProductPage /> : <Navigate to='/admin/signin' />} />
           <Route path='/admin/all-users' element={user ? <Users /> :  <Navigate to='/admin/signin' />}/>
           <Route path='/admin/staff' element={user ? <Staff /> :  <Navigate to='/admin/signin' />}/>
           <Route path='/admin/dashboard' element={user ? <Dashboard />:  <Navigate to='/admin/signin' />}/>
 
           {/* Fallback route - Sirf galat URL par chalega */}
-          <Route path='*' element={user ? <Navigate to='/admin/' /> : <Navigate to='/admin/signin' />} />
-
+          <Route path='*' element={user ? <Navigate to='/admin/' /> : <Navigate to='/admin/signUp' />} />
         </Routes>
       </main>
     </div>

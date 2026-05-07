@@ -2,8 +2,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 
 export const newUser = async({
-    username ,
-    email,
+    identifier,
     password,
     role
 })=>{
@@ -13,7 +12,6 @@ export const newUser = async({
         password,       
         role,
     })
-if(!user) return console.log("User is not created in user service file")
     const token = jwt.sign({ id : user.id , role: user.role }, process.env.JWT_SECRET);
     return {user , token};
 }

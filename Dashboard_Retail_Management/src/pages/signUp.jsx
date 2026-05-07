@@ -27,9 +27,9 @@ const SignUp = () => {
   })
   // ✅ Form Validation
   const Formvalidate = () => {
-    const { email , username, password } = Formdata;
+    const { identifier , password } = Formdata;
 
-    if (!username || !email || !password) {
+    if (!identifier || !password) {
       toast.error("All fields are required");
       return false;
     }
@@ -46,8 +46,7 @@ const SignUp = () => {
 
     if (!Formvalidate()) return;
       const payload = {
-        username: Formdata.username,
-        email: Formdata.email,
+        identifier: Formdata.identifier,
         password: Formdata.password,
         role: "admin",
       };
@@ -81,36 +80,22 @@ const SignUp = () => {
           <div className="flex gap-3 w-full">
             <div className="flex-1">
               <label className="text-sm font-medium text-gray-700">
-                FullName
+                Email/Password
               </label>
               <input
                 onChange={(e) =>
                   setFormdata((prev) => ({
                     ...prev,
-                    username: e.target.value,
+                    identifier: e.target.value,
                   }))
                 }
-                value={Formdata.username}
+                value={Formdata.identifier}
                 type="text"
-                placeholder="Enter Your Fullname"
+                placeholder="Email/Password"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-[#20B0A4]"
               />
             </div>
           </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-700">Email</label>
-            <input
-              onChange={(e) =>
-                setFormdata((prev) => ({ ...prev, email: e.target.value }))
-              }
-              value={Formdata.email}
-              type="email"
-              placeholder="Enter your email"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-[#20B0A4]"
-            />
-          </div>
-
           <div>
             <label className="text-sm font-medium text-gray-700">
               Password*
@@ -125,7 +110,6 @@ const SignUp = () => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-[#20B0A4]"
             />
           </div>
-
           <div className="flex items-center justify-between">
             <label
               htmlFor="Showpassword"
