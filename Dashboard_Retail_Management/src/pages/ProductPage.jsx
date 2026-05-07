@@ -66,13 +66,13 @@
               return res.data
             }
           },
-          {
-            queryKey : ["brands"],
-            queryFn : async()=>{
-              const res = await axiosInstance.get('/brands')
-              return res.data
-            }
-          }
+          // {
+          //   queryKey : ["brands"],
+          //   queryFn : async()=>{
+          //     const res = await axiosInstance.get('/brands')
+          //     return res.data
+          //   }
+          // }
           // {
           //   queryKey: ["searchProducts" , searchItem], 
           //   queryFn : async()=>{
@@ -88,7 +88,7 @@
 
     const FetchProductsArray = results[0]?.data?.data || []
     const FetchCategoryArray = results[1]?.data || []
-    const FetchBrandArray = results[2]?.data || []
+    // const FetchBrandArray = results[2]?.data || []
      // nst FetchSearchProducts = results[3].data || []
   
 
@@ -249,28 +249,38 @@
   }
     // ---------- JSX ----------
     return (
-      <div className="w-[80%] top-0 absolute left-64 h-screen">
-      <header className="border-b border-[#72727293] bg-white w-full relative">
-          <div className="px-6 mt-10 py-5 relative  z-999 flex items-center justify-between bg-white">
+      <div className="w-[81%]  top-0 absolute left-60 h-screen  bg-[#F8FAFC]">
+      <header className="w-full relative">
+          <div className="px-6 mt-10 py-5 relative  z-999 flex items-center justify-between">
             <h1 className="font-bold text-4xl">All Products</h1>
 
-            <div className="flex items-center gap-5">
+            <div className=" w-[70%] flex items-center gap-2 justify-end">
+              {/* ---------- Search Bar ---------- */}
+        <header className="px-6 py-5 w-fit flex items-center justify-between">
+          <input
+            type="text"
+            value={searchItem}
+            placeholder="Search product..."
+            onChange={(e) => setSearchItem(e.target.value)}
+            className="border outline-none border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#20B0A4]"
+          />
+        </header>
               {/* Add Brand Icon */}
               <FolderTree
                 onClick={() => setShowBrandForm((prev) => !prev)}
-                className="text-[20px] p-[3%] cursor-pointer hover:bg-black transition-all duration-200 hover:text-white w-10 bg-gray-100 rounded-full h-10 text-gray-500"
+                className="text-[20px] p-[1%] cursor-pointer hover:bg-black transition-all duration-200 hover:text-white w-10 bg-gray-100 rounded-full h-10 text-gray-500"
               />
 
               {/* Add Category Icon */}
               <BadgeCheck
                 onClick={() => setShowCategoryForm((prev) => !prev)}
-                className="text-[20px] p-[3%] cursor-pointer hover:bg-black transition-all duration-200 hover:text-white w-10 bg-gray-100 rounded-full h-10 text-gray-500"
+                className="text-[20px] p-[1%] cursor-pointer hover:bg-black transition-all duration-200 hover:text-white w-10 bg-gray-100 rounded-full h-10 text-gray-500"
               />
 
               {/* Add Product Button */}
               <div
                 onClick={() => setShowProductForm((prev) => !prev)}
-                className="btn bg-[#0e6d65] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
+                className="btn bg-[#20B0A4] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
               >
                 <Plus />
                 <button>Add Product</button>
@@ -278,87 +288,10 @@
             </div>
           </div>
 
-          {/* ---------- Add Product Form ---------- */}
-          <div
-            className={`absolute transition-all duration-300 ${
-              showProductForm ? "top-17" : "top-[-300%]"
-            } w-full p-5 rounded-xl bg-[#f8f6f6]`}
-          >
-            <h1 className="text-xl mb-3">Add New Product</h1>
-
-            <form
-              onSubmit={e => handleSubmitProduct(e)}
-              className="py-5 w-full rounded flex items-center flex-wrap gap-2"
-            >
-              <input
-                name="Name"
-                placeholder="Product Name"
-                value={formData.Name}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
-              <input
-                name="Price"
-                placeholder="Price"
-                value={formData.Price}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
-              <input
-                name="Discount"
-                placeholder="Discount"
-                value={formData.Discount}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
-              <input
-                name="Stock"
-                placeholder="Stock"
-                value={formData.Stock}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
-              {/* Brand dropdown */}
-              <select
-                name="brandName"
-                value={formData.brandName}
-                onChange={e => handleProductChange(e)}
-                className="border p-2 w-50 outline-none rounded border-[#cfcfcfda]"
-              >
-                <option value="">Select Brand</option>
-                {FetchBrandArray.brands?.map((b, idx) => (
-                  <option key={b.id ?? b.brandName ?? idx} value={b._id}>
-                    {b.brandName}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                name="Description"
-                placeholder="Description"
-                value={formData.Description}
-                onChange={e => handleProductChange(e)}
-                className="border outline-none border-[#cfcfcfda] p-2 w-50 "
-              />
-              <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#cfcfcfda]">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={e => handleProductFile(e)}
-                className="mb-2"
-              />
-              </div>
-              <button
-                type="submit"
-                className="cursor-pointer bg-gray-800 text-white px-4 py-2 rounded"
-              >
-                Add Product
-              </button> 
-            </form>
-          </div>
+         
 
           {/* ---------- Add Brand Form ---------- */}
-          <div
+          {/* <div
             className={`absolute transition-all duration-300 ${
               showBrandForm ? "top-17" : "top-[-200%]"
             } w-full p-5 rounded-xl bg-[#f8f6f6]`}
@@ -379,7 +312,7 @@
               />
 
               {/* Category dropdown */}
-              <select
+              {/* <select
                 name="categoryName"
                 value={brandData.categoryName}
                 onChange={(e) => setBrandData({...brandData, categoryName: e.target.value})}
@@ -406,10 +339,10 @@
                 Add Brand
               </button>
             </form>
-          </div>
+          </div> */}
 
           {/* ---------- Add Category Form ---------- */}
-          <div
+          {/* <div
             className={`absolute transition-all duration-300 ${
               showCategoryForm ? "top-17" : "top-[-200%]"
             } w-full p-5 rounded-xl bg-[#f8f6f6]`}
@@ -435,31 +368,125 @@
                 Add Category
               </button>
             </form>
-          </div>
+          </div> */}
         </header>
 
-        {/* ---------- Search Bar ---------- */}
-        <header className="border-b border-[#cfcfcfda] px-6 py-5 w-full flex items-center justify-between">
-          <input
-            type="text"
-            value={searchItem}
-            placeholder="Search product..."
-            onChange={(e) => setSearchItem(e.target.value)}
-            className="border outline-none border-[#cfcfcf] p-2 rounded w-[50%]"
-          />
-        </header>
-      <div className="w-full  overflow-x-auto shadow-sm rounded-lg border border-gray-200">
-    <table className="w-full text-left border-collapse bg-white">
+        
+      <div className="w-full  overflow-hidden shadow-sm rounded-lg  ">
+         {/* ---------- Add Product Form ---------- */}
+          <div className={`transition-all duration-300 ${
+              showProductForm ? "mt-5" : "mt-[-33.5%]"
+            } w-full `}>
+          <div className="m-5 p-10 border-gray-200 border-1 rounded-lg bg-white ">
+            <h1 className="text-xl mb-3">Add New Product</h1>
+
+            <form
+              onSubmit={e => handleSubmitProduct(e)}
+              className="py-5 w-full rounded flex items-center flex-wrap gap-6"
+            >
+              <div>
+                <h3 className="text-[#4B5563]">Full Name</h3>
+              <input
+                name="Name"
+                value={formData.Name}
+                onChange={e => handleProductChange(e)}
+                className="border rounded outline-none border-[#D1D5DB] p-2 w-50 mb-2"
+              />
+              </div>
+              <div>
+                <h3 className="text-[#4B5563]">Price</h3>
+                <input
+                name="Price"
+                value={formData.Price}
+                onChange={e => handleProductChange(e)}
+                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+              />
+              </div>
+              <div>
+                <h3 className="text-[#4B5563]">Discount</h3>
+              <input
+                name="Discount"
+                value={formData.Discount}
+                onChange={e => handleProductChange(e)}
+                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+              />
+              </div>
+              <div>
+                <h3 className="text-[#4B5563]">Stock</h3>
+              <input
+                name="Stock"
+                value={formData.Stock}
+                onChange={e => handleProductChange(e)}
+                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+              />
+              </div>
+              {/* Brand dropdown */}
+              <div>
+                <h3 className="text-[#4B5563]">Brand</h3>
+              <select
+                name="brandName"
+                value={formData.brandName}
+                onChange={e => handleProductChange(e)}
+                className="border p-2 w-50 outline-none rounded border-[#cfcfcfda]"
+              >
+                <option value="">Select Brand</option>
+                {/* {FetchBrandArray.brands?.map((b, idx) => (
+                  <option key={b.id ?? b.brandName ?? idx} value={b._id}>
+                  {b.brandName}
+                  </option>
+                  ))} */}
+              </select>
+              </div>
+              <div>
+                <h3 className="text-[#4B5563]">Description</h3>
+              <input
+                name="Description"
+                value={formData.Description}
+                onChange={e => handleProductChange(e)}
+                className="border outline-none border-[#cfcfcfda] p-2 w-50 "
+              />
+              </div>
+              <div>
+                <h3 className="text-[#4B5563]">Image</h3>
+              <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#cfcfcfda]">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => handleProductFile(e)}
+                className="mb-2"
+              />
+              </div>
+              </div>
+              <div className="flex gap-3 pt-5 justify-end w-60 ">
+              <button
+                type="submit"
+                className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
+              >
+                Add Product
+              </button> 
+              <button
+                onClick={() => setShowProductForm((prev) => !prev)}
+                type="submit"
+                className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
+              >
+                  Cancel
+              </button> 
+            </div>
+            </form>
+          </div>
+          </div>
+          
+    <table className="w-[96.5%] m-5  border-gray-200 border-2 rounded-lg bg-white">
       {/* Table Header */}
-      <thead className="bg-gray-100 w-full border-b border-gray-300">
+      <thead className="bg-white border-b border-gray-300">
         <tr>
-          <th className="px-4 py-3 font-semibold text-gray-700">Name</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">Price</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">Discount</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">Description</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">Stock</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">Brand</th>
-          <th className="px-4 py-3 font-semibold text-gray-700 text-right">Actions</th>
+          <th className="px-2 py-3 font-semibold text-gray-700">Name</th>
+          <th className="px-2 py-3 font-semibold text-gray-700">Price</th>
+          <th className="px-2 py-3 font-semibold text-gray-700">Discount</th>
+          <th className="px-2 py-3 font-semibold text-gray-700">Description</th>
+          <th className="px-2 py-3 font-semibold text-gray-700">Stock</th>
+          <th className="px-2 py-3 font-semibold text-gray-700">Brand</th>
+          <th className="px-2 py-3 font-semibold text-gray-700 text-right">Actions</th>
         </tr>
       </thead>
 
@@ -467,13 +494,13 @@
       { FetchProductsArray.length > 0 ?
       (<tbody className="divide-y divide-gray-200">
         {FetchProductsArray?.map((p, idx) => (
-          <tr key={idx} className="hover:bg-gray-50 transition-colors">
-            <td className="px-4 py-4 text-sm text-gray-800 font-medium">{p.Name}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.Price}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.Discount}%</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.Description?.split(' ').slice(0, 4).join(' ') + "..."}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.Stock}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.brandName}</td>
+          <tr key={idx} className="hover:bg-[#E8F7F6] transition-colors">
+            <td className="px-2 py-4 text-sm text-gray-800 font-medium">{p.Name}</td>
+            <td className="px-2 py-4 text-sm text-gray-600">{p.Price}</td>
+            <td className="px-2 py-4 text-sm text-gray-600">{p.Discount}%</td>
+            <td className="px-2 py-4 text-sm text-gray-600">{p.Description?.split(' ').slice(0, 4).join(' ') + "..."}</td>
+            <td className="px-2 py-4 text-sm text-gray-600">{p.Stock}</td>
+            <td className="px-2 py-4 text-sm text-gray-600">{p.brandName}</td>
             
             <td className="px-4 py-4 text-right">
               <div className="flex justify-end gap-3">
