@@ -373,9 +373,9 @@
         
       <div className="w-full  overflow-hidden shadow-sm rounded-lg  ">
          {/* ---------- Add Product Form ---------- */}
-          <div className={`transition-all duration-300 ${
-              showProductForm ? "mt-5" : "mt-[-34.5%]"
-            } w-full h-20%  `}>
+          <div className={`transition-all ${
+              showProductForm ? "h-90" : "h-0"
+            } w-full overflow-hidden  `}>
           <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
             <h1 className="text-xl mb-3">Add New Product</h1>
 

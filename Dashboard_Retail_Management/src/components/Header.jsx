@@ -18,7 +18,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-[#ffffff] w-[80%] absolute left-64 z-50">
+    <header className="bg-[#F8FAFC] w-[81%] absolute left-60 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-end">
         <div className="relative  right-0 ">
           <button

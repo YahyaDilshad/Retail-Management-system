@@ -9,8 +9,6 @@
   const Staff = () => {
     
     const [showstaffForm, setShowstaffForm] = useState(false);
-    const [showCategoryForm, setShowCategoryForm] = useState(false);
-    const [showBrandForm, setShowBrandForm] = useState(false);
     const [searchItem, setSearchItem] = useState("");
     
     const queryClient  = useQueryClient()
@@ -99,16 +97,16 @@
       IDBackImage: null
     });
 
-    const handleProductFile = (e) => {
+    const handlestaffFile = (e) => {
     const { name , files} = e.target;
     setFormData((prev) => ({ ...prev , [name] : files[0]}))
     };
-    const handleProductChange = (e) => {
+    const handleStaffChange = (e) => {
       const { name, value } = e.target; // Small letters use karein
       setFormData({ ...formData, [name]: value });
     };
 
-  const handleSubmitProduct = async (e) => {
+  const handleSubmitstaff = async (e) => {
     e.preventDefault();
     
     const data = new FormData();
@@ -155,262 +153,325 @@
 
     // ---------- JSX ----------
     return (
-      <div className="w-[80%] top-0 absolute left-64 h-screen">
-      <header className="border-b border-[#72727293] bg-white w-full relative">
-          <div className="px-6 mt-10 py-5 relative  z-999 flex items-center justify-between bg-white">
-            <h1 className="font-bold text-4xl">Staff Management</h1>
-
-            <div className="flex items-center gap-5">
-              {/* Add Staff Button */}
-              <div
-                onClick={() => setShowstaffForm((prev) => !prev)}
-                className="btn bg-[#0e6d65] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
-              >
-                <Plus />
-                <button>Create Staff</button>
-              </div>
-            </div>
-          </div>
-
-          {/* ---------- Add Product Form ---------- */}
-          <div
-            className={`absolute transition-all duration-300 ${
-              showstaffForm ? "top-17" : "top-[-400%]"
-            } w-full h-100 p-5 rounded-xl bg-[#f8f6f6]`}
-          >
-            <h1 className="text-xl mb-3">Add New Staff</h1>
-
-            <form
-              onSubmit={e => handleSubmitProduct(e)}
-              className="py-5 pb-15 w-full rounded relative flex items-center flex-wrap gap-2"
-            >
-             <div className="mx-3 ">
-                <h6 className="text-[14px] text-[#000000a4]" >Full Name</h6   >
-              <input
-                name="Name"
-                placeholder="Product Name"
-                value={formData.Name}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#000000bb] p-2 w-40 mb-2"
-                />
-              </div>
-              <div className="mx-3">
-                <h6 className="text-[14px] text-[#000000a4]" >Father's Name</h6   >
-              <input
-                name="FatherName"
-                placeholder="FatherName"
-                value={formData.FatherName}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#000000bb] p-2 w-40 mb-2"
-              />
-              </div>
-              <div className="mx-3">
-                <h6 className="text-[14px] text-[#000000a4]" >Designation</h6 >
-              <input
-                name="Designation"
-                placeholder="Designation"
-                value={formData.Designation}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#000000bb] p-2 w-40 mb-2"
-              />
-              </div>
-              <div className="mx-3">
-                <h6 className="text-[14px] text-[#000000a4]" >Email</h6   >
-              <input
-                name="email"
-                placeholder="email"
-                value={formData.email}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#000000bb] p-2 w-40 mb-2"
-              />
-              </div>
-              <div className="mx-3">
-                <h6 className="text-[14px] text-[#000000a4]" >CNIC Number</h6   >
-              <input
-                name="CNICnumber"
-                placeholder="CNIC"
-                value={formData.CNICnumber}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#000000bb] p-2 w-40 mb-2"
-              />
-              </div>
-              <div className="mx-3">
-                <h6 className="text-[14px] text-[#000000a4]" >Address</h6 >
-
-              <input
-                name="Address"
-                placeholder="Address"
-                value={formData.Address}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#000000bb] p-2 w-40 mb-2"
-              />
-
-              </div>
-              <div className="mx-3">
-                <h6 className="text-[14px] text-[#000000a4]" >Gender </h6 >
-
-              <select
-                name="Gender"
-                value={formData.Gender}
-                onChange={e => handleProductChange(e)}
-                className="border p-2 w-40 outline-none rounded border-[#000000bb]"
-              >
-                <option value="">Select Brand</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-              </div>
-            <div className="mx-3">
-                <h6 className="text-[14px] text-[#000000a4]" >Mobile Number</h6   >
-                <input
-                name="MobileNumber"
-                placeholder="MobileNumber"
-                value={formData.MobileNumber}
-                onChange={e => handleProductChange(e)}
-                className="border outline-none border-[#000000bb] p-2 w-40 "
-              />
-            </div>
-            <div className="mx-3">
-                <h6 className="text-[14px] text-[#000000a4]" >Bankholder Name</h6 >
-
-              <input
-                name="bankHolderName"
-                placeholder="bankHolderName"
-                value={formData.bankHolderName}
-                onChange={e => handleProductChange(e)}
-                className="border outline-none border-[#000000bb] p-2 w-40 "
-              />
-            </div>
-            <div className="mx-3 ">
-            <h6 className="text-[14px] text-[#000000a4]" >Account Number</h6  >
-            <input
-                name="AccountNumber"
-                placeholder="AccountNumber"
-                value={formData.AccountNumber}
-                onChange={e => handleProductChange(e)}
-                className="border outline-none border-[#000000bb] p-2 w-40 "
-              />
-            </div>
-            <div className="mx-3">
-            <h6 className="text-[14px] text-[#000000a4]" >Branch Name</h6 >
-            <input
-                name="BranchName"
-                placeholder="BranchName"
-                value={formData.BranchName}
-                onChange={e => handleProductChange(e)}
-                className="border outline-none border-[#000000bb] p-2 w-40 "
-              />
-            </div>
-            <div className="mx-3 my-2" >
-            <h6 className="text-[14px] text-[#000000a4]" >ID Card FrontImage</h6  >
-                  <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#000000bb]">
-              <input
-                name="IDFrontImage"
-                type="file"
-                accept="image/*"
-                onChange={e => handleProductFile(e)}
-                className="mb-2"
-              />
-              </div>
-            </div>
-            <div className="mx-3 my-2">
-                <h6 className="text-[14px] text-[#000000a4]" >ID Card BackImage</h6   >
-             <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#000000bb]">
-            <input
-                name="IDBackImage"
-                type="file"
-                accept="image/*"
-                onChange={e => handleProductFile(e)}
-                className="mb-2"
-            />
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-5 mx-3 absolute left-0 bottom-0">
-               <button
-                type="submit"
-                className="cursor-pointer bg-[#0E6D65] text-white px-4 py-2 rounded"
-              >
-                Add Staff
-              </button> 
-               <button
-               onClick={()=>{
-                setShowstaffForm(false)
-               }}
-                type="submit"
-                className="cursor-pointer bg-[#d4d4d4] text-[#000000c4] px-4 py-2 rounded"
-              >
-                Cancel
-              </button> 
-            </div>
-            </form>
-          </div>
-        </header>
-
-        {/* ---------- Search Bar ---------- */}
-        <header className="border-b border-[#cfcfcfda] px-6 py-5 w-full flex items-center justify-between">
-          <input
-            type="text"
-            value={searchItem}
-            placeholder="Search product..."
-            onChange={(e) => setSearchItem(e.target.value)}
-            className="border outline-none border-[#cfcfcf] p-2 rounded w-[50%]"
-          />
-        </header>
-      <div className="w-full overflow-x-auto shadow-sm rounded-lg border border-gray-200">
-    <table className="w-full text-left border-collapse bg-white">
-      {/* Table Header */}
-      <thead className="bg-gray-100 w-full border-b border-gray-300">
-        <tr>
-          <th className="px-4 pr-10 py-3 font-semibold text-gray-700">Name</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">FatherName</th>
-          <th className="px-10 py-3 font-semibold text-gray-700">Designation</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">CNIC</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">Email</th>
-          <th className="px-10 py-3 font-semibold text-gray-700">Address</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">BankHolderName</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">AccountNumber</th>
-          <th className="px-4 py-3 font-semibold text-gray-700">PhoneNmber</th>
-          <th className="px-4 py-3 font-semibold text-gray-700 text-right">Action</th>
-        </tr>
-      </thead>
-
-      {/* Table Body */}
-      { FetchStaffsArray.length > 0 ?
-      (<tbody className="divide-y divide-gray-200">
-        {FetchStaffsArray?.map((p, idx) => (
-          <tr key={idx} className="hover:bg-gray-50 transition-colors">
-            <td className="px-4 pr-10 py-4 text-sm text-gray-800 font-medium">{p.Name}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.FatherName}</td>
-            <td className="px-10 py-4 text-sm text-gray-600">{p.Designation?.split(' ').slice(0 , 2).join(" ") + "..."}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.email ? p.email : '-'}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.CNICnumber ? p.CNICnumber : '-'}</td>
-            <td className="px-10 py-4 text-sm text-gray-600">{p.Address?.split(' ').slice(0,2).join(' ') + "..."}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.bankHolderName}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.AccountNumber}</td>
-            <td className="px-4 py-4 text-sm text-gray-600">{p.MobileNumber}</td>
-
-            <td className="px-4 py-4 text-right">
-              <div className="flex justify-end gap-3">
-                
-                <button onClick={() => handleDelete(p.id)} className="p-2 bg-red-50 hover:bg-red-100 rounded-md transition-all">
-                  <Trash2 className="w-4 h-4 text-red-600" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>)
-      :(<tbody>
-        <tr>
-          <td colSpan={7} className="text-center py-20">Staff Not Found</td>
-        </tr>
-      </tbody>)}
-
-          </table>
-
-        </div>
-        
-      </div>
+     <div className="flex-1 ml-60 min-h-screen bg-[#F8FAFC] transition-all duration-300">
+           <header className="w-full relative">
+               <div className="px-6 mt-10 py-5 relative flex items-center justify-between">
+                 <h1 className="font-bold text-3xl">Staff Management</h1>
+               <div className=" w-[70%] flex items-center gap-2 justify-end">
+                   {/* ---------- Search Bar ---------- */}
+             <header className="px-6 py-5 w-fit flex items-center justify-between">
+               <input
+                 type="text"
+                 value={searchItem}
+                 placeholder="Search Staff..."
+                 onChange={(e) => setSearchItem(e.target.value)}
+                 className="border border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#20B0A4]"
+               />
+             </header>
+                   {/* Add Staff Button */}
+                   <div
+                     onClick={() => setShowstaffForm((prev) => !prev)}
+                     className="btn bg-[#20B0A4] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
+                   >
+                     <Plus />
+                     <button>Add Staff</button>
+                   </div>
+                 </div>
+               </div>
+     
+              
+     
+               {/* ---------- Add Brand Form ---------- */}
+               {/* <div
+                 className={`absolute transition-all duration-300 ${
+                   showBrandForm ? "top-17" : "top-[-200%]"
+                 } w-full p-5 rounded-xl bg-[#f8f6f6]`}
+               >
+                 <h1 className="text-xl mb-3">Add New Brand</h1>
+                 <form
+                   onSubmit={handleBrand}
+                   className="py-5 w-full rounded flex items-center flex-wrap gap-2"
+                 >
+                   <input
+                     name="name"
+                     placeholder="Brand Name"
+                     value={brandData.brandName}
+                     onChange={(e) =>
+                       setBrandData({ ...brandData, brandName: e.target.value })
+                     }
+                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+                   />
+     
+                   {/* Category dropdown */}
+                   {/* <select
+                     name="categoryName"
+                     value={brandData.categoryName}
+                     onChange={(e) => setBrandData({...brandData, categoryName: e.target.value})}
+                     className="..."
+                   >
+                     <option value="">Select Category</option>
+                     {FetchCategoryArray.categories?.map((cat) => (
+                       <option key={cat.id} value={cat.categoryName}>{cat.categoryName}</option>
+                     ))}
+                   </select>
+     
+                   <input
+                     type="file"
+                     accept="image/*"
+                     onChange={(e) =>
+                       setBrandData({ ...brandData, Image: e.target.files[0] })
+                     }
+                     className="mb-2"
+                   />
+                   <button
+                     type="submit"
+                     className="cursor-pointer bg-gray-800 text-white px-4 py-2 rounded"
+                   >
+                     Add Brand
+                   </button>
+                 </form>
+               </div> */}
+     
+               {/* ---------- Add Category Form ---------- */}
+               {/* <div
+                 className={`absolute transition-all duration-300 ${
+                   showCategoryForm ? "top-17" : "top-[-200%]"
+                 } w-full p-5 rounded-xl bg-[#f8f6f6]`}
+               >
+                 <h1 className="text-xl mb-3">Add New Category</h1>
+                 <form
+                   onSubmit={handleCategory}
+                   className="py-5 w-full rounded flex items-center flex-wrap gap-2"
+                 >
+                   <input
+                     name="categoryName"
+                     placeholder="Category Name"
+                     value={categoryData.categoryName}
+                     onChange={(e) =>
+                       setCategoryData({ ...categoryData, categoryName: e.target.value })
+                     }
+                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+                   />
+                   <button
+                     type="submit"
+                     className="cursor-pointer bg-gray-800 text-white px-4 py-2 rounded"
+                   >
+                     Add Category
+                   </button>
+                 </form>
+               </div> */}
+             </header>
+     
+             
+           <div className="w-full  overflow-hidden shadow-sm rounded-lg  ">
+              {/* ---------- Add Product Form ---------- */}
+               <div className={`transition-all ${
+                   showstaffForm ? "h-140" : "h-0"
+                 } w-full overflow-hidden  `}>
+               <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
+                 <h1 className="text-xl mb-3">Add New Staff</h1>
+     
+                 <form
+                   onSubmit={e => handleSubmitstaff(e)}
+                   className="py-5 w-full rounded flex items-center flex-wrap gap-6"
+                 >
+                   <div>
+                     <h3 className="text-[#4B5563]">Name</h3>
+                   <input
+                     name="Name"
+                     value={formData.Name}
+                     onChange={e => handleStaffChange(e)}
+                     className="border rounded outline-none border-[#D1D5DB] p-2 w-50 mb-2"
+                   />
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">Father Name</h3>
+                     <input
+                     name="FatherName"
+                     value={formData.FatherName}
+                     onChange={e => handleStaffChange(e)}
+                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+                   />
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">Email</h3>
+                   <input
+                     name="email"
+                     value={formData.email}
+                     onChange={e => handleStaffChange(e)}
+                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+                   />
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">Designation</h3>
+                   <input
+                     name="Designation"
+                     value={formData.Designation}
+                     onChange={e => handleStaffChange(e)}
+                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+                   />
+                   </div>
+                   {/* gender dropdown */}
+                   <div>
+                     <h3 className="text-[#4B5563]">Gender</h3>
+                   <select
+                     name="Gender"
+                     value={formData.Gender}
+                     onChange={e => handleStaffChange(e)}
+                     className="border p-2 w-50 outline-none rounded border-[#cfcfcfda]"
+                   >
+                     <option value="">Select Gender</option>
+                     <option value="Male">Male</option>
+                     <option value="Female">Female</option>
+                   </select>
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">CNIC Number</h3>
+                   <input
+                     name="CNICnumber"
+                     value={formData.CNICnumber}
+                     onChange={e => handleStaffChange(e)}
+                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
+                   />
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">Mobile Number</h3>
+                   <input
+                     name="MobileNumber"
+                     value={formData.MobileNumber}
+                     onChange={e => handleStaffChange(e)}
+                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
+                   />
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">Address</h3>
+                   <input
+                     name="Address"
+                     value={formData.Address}
+                     onChange={e => handleStaffChange(e)}
+                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
+                   />
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">Account Number</h3>
+                   <input
+                     name="AccountNumber"
+                     value={formData.AccountNumber}
+                     onChange={e => handleStaffChange(e)}
+                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
+                   />
+                   </div>
+                  <div>
+                     <h3 className="text-[#4B5563]">Bankholder Name</h3>
+                   <input
+                     name="bankHolderName"
+                     value={formData.bankHolderName}
+                     onChange={e => handleStaffChange(e)}
+                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
+                   />
+                   </div>
+                  <div>
+                     <h3 className="text-[#4B5563]">Branch Name</h3>
+                   <input
+                     name="BranchName"
+                     value={formData.BranchName}
+                     onChange={e => handleStaffChange(e)}
+                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
+                   />
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">Idcard Front </h3>
+                   <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#cfcfcfda]">
+                   <input
+                     type="file"
+                     accept="image/*"
+                     onChange={e => handlestaffFile(e)}
+                     className="mb-2"
+                   />
+                   </div>
+                   </div>
+                   <div>
+                     <h3 className="text-[#4B5563]">Idcard Back </h3>
+                   <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#cfcfcfda]">
+                   <input
+                     type="file"
+                     accept="image/*"
+                     onChange={e => handlestaffFile(e)}
+                     className="mb-2"
+                   />
+                   </div>
+                   </div>
+                   <div className="flex gap-3 pt-5  w-55 ">
+                   <button
+                     type="submit"
+                     className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
+                   >
+                     Add Product
+                   </button> 
+                   <button
+                     onClick={() => setShowProductForm((prev) => !prev)}
+                     type="submit"
+                     className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
+                   >
+                       Cancel
+                   </button> 
+                 </div>
+                 </form>
+               </div>
+               </div>
+               
+         <table className="w-[96.5%] m-5 border-gray-200 border-2 rounded-lg bg-white">
+           {/* Table Header */}
+           <thead className="bg-white border-b border-gray-300">
+             <tr>
+               <th className="px-2 py-3 font-semibold text-gray-700">Name</th>
+               <th className="px-2 py-3 font-semibold text-gray-700">Father Name</th>
+               <th className="px-2 py-3 font-semibold text-gray-700">Designation</th>
+               <th className="px-2 py-3 font-semibold text-gray-700">CNIC</th>
+               <th className="px-2 py-3 font-semibold text-gray-700">Email</th>
+               <th className="px-2 py-3 font-semibold text-gray-700">Account Number</th>
+               <th className="px-2 py-3 font-semibold text-gray-700">Gender</th>
+               <th className="px-2 py-3 font-semibold text-gray-700 text-right">Actions</th>
+             </tr>
+           </thead>
+     
+           {/* Table Body */}
+           {FetchStaffsArray.length > 0 ?
+           (<tbody className="divide-y divide-gray-200">
+             {FetchStaffsArray?.map((p, idx) => (
+               <tr key={idx} className="hover:bg-[#E8F7F6] transition-colors">
+                 <td className="px-2 py-4 text-sm text-gray-800 font-medium">{p.Name}</td>
+                 <td className="px-2 py-4 text-sm text-gray-600">{p.FatherName}</td>
+                 <td className="px-2 py-4 text-sm text-gray-600">{p.Designation}</td>
+                 <td className="px-2 py-4 text-sm text-gray-600">{p.CNICnumber}</td>
+                 <td className="px-2 py-4 text-sm text-gray-600">{p.email}</td>
+                 <td className="px-2 py-4 text-sm text-gray-600">{p.AccountNumber}</td>
+                 <td className="px-2 py-4 text-sm text-gray-600">{p.Gender}</td>
+                 
+                 <td className="px-4 py-4 text-right">
+                   <div className="flex justify-end gap-3">
+                     <button className="p-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-all">
+                       <Edit className="w-4 h-4 text-gray-700" />
+                     </button>
+                     <button onClick={() => handleDelete(p.id)} className="p-2 bg-red-50 hover:bg-red-100 rounded-md transition-all">
+                       <Trash2 className="w-4 h-4 text-red-600" />
+                     </button>
+                   </div>
+                 </td>
+               </tr>
+             ))}
+           </tbody>)
+           :(<tbody>
+             <tr>
+               <td colSpan={7} className="text-center py-20">Products Not Found</td>
+             </tr>
+           </tbody>)}
+     
+               </table>
+     
+             </div>
+             
+           </div>
       
     );
   };
