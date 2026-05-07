@@ -26,7 +26,7 @@
     const results = useQueries({
         queries :[
           {
-            queryKey : ['Staffs'],
+            queryKey : ['staffs'],
             queryFn : async()=>{
               const res = await axiosInstance.get('/staff')
               return res.data
@@ -142,7 +142,7 @@
       
       // Form Reset
       setFormData({
-        Name: "", FatherName: "", Designation: "",email : "" , Gender : "" ,BranchName : "" , AccountNumber : "", Address : "" , CNICnumber: "", MobileNumber: "", Address: "", IDBackImage: null,IDFrontImage: ""
+        Name: "", FatherName: "", Designation: "",email : "" , Gender : "" ,BranchName : "" , AccountNumber : "", Address : "" , CNICnumber: "", MobileNumber: "", Address: "", IDBackImage: null,IDFrontImage: null
       });
       setShowstaffForm(false);
     } catch (error) {
@@ -178,88 +178,6 @@
                    </div>
                  </div>
                </div>
-     
-              
-     
-               {/* ---------- Add Brand Form ---------- */}
-               {/* <div
-                 className={`absolute transition-all duration-300 ${
-                   showBrandForm ? "top-17" : "top-[-200%]"
-                 } w-full p-5 rounded-xl bg-[#f8f6f6]`}
-               >
-                 <h1 className="text-xl mb-3">Add New Brand</h1>
-                 <form
-                   onSubmit={handleBrand}
-                   className="py-5 w-full rounded flex items-center flex-wrap gap-2"
-                 >
-                   <input
-                     name="name"
-                     placeholder="Brand Name"
-                     value={brandData.brandName}
-                     onChange={(e) =>
-                       setBrandData({ ...brandData, brandName: e.target.value })
-                     }
-                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                   />
-     
-                   {/* Category dropdown */}
-                   {/* <select
-                     name="categoryName"
-                     value={brandData.categoryName}
-                     onChange={(e) => setBrandData({...brandData, categoryName: e.target.value})}
-                     className="..."
-                   >
-                     <option value="">Select Category</option>
-                     {FetchCategoryArray.categories?.map((cat) => (
-                       <option key={cat.id} value={cat.categoryName}>{cat.categoryName}</option>
-                     ))}
-                   </select>
-     
-                   <input
-                     type="file"
-                     accept="image/*"
-                     onChange={(e) =>
-                       setBrandData({ ...brandData, Image: e.target.files[0] })
-                     }
-                     className="mb-2"
-                   />
-                   <button
-                     type="submit"
-                     className="cursor-pointer bg-gray-800 text-white px-4 py-2 rounded"
-                   >
-                     Add Brand
-                   </button>
-                 </form>
-               </div> */}
-     
-               {/* ---------- Add Category Form ---------- */}
-               {/* <div
-                 className={`absolute transition-all duration-300 ${
-                   showCategoryForm ? "top-17" : "top-[-200%]"
-                 } w-full p-5 rounded-xl bg-[#f8f6f6]`}
-               >
-                 <h1 className="text-xl mb-3">Add New Category</h1>
-                 <form
-                   onSubmit={handleCategory}
-                   className="py-5 w-full rounded flex items-center flex-wrap gap-2"
-                 >
-                   <input
-                     name="categoryName"
-                     placeholder="Category Name"
-                     value={categoryData.categoryName}
-                     onChange={(e) =>
-                       setCategoryData({ ...categoryData, categoryName: e.target.value })
-                     }
-                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                   />
-                   <button
-                     type="submit"
-                     className="cursor-pointer bg-gray-800 text-white px-4 py-2 rounded"
-                   >
-                     Add Category
-                   </button>
-                 </form>
-               </div> */}
              </header>
      
              
@@ -401,15 +319,16 @@
                    />
                    </div>
                    </div>
-                   <div className="flex gap-3 pt-5  w-55 ">
+                   <div className="flex gap-3 pt-5  w-60 ">
                    <button
+                    disabled={CreateStaffArray.isLoading}
                      type="submit"
                      className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
                    >
-                     Add Product
+                     {CreateStaffArray.isLoading ? <Loader className="animate-spin"/> : "Add Staff"}
                    </button> 
                    <button
-                     onClick={() => setShowProductForm((prev) => !prev)}
+                     onClick={() => setShowstaffForm((prev) => !prev)}
                      type="submit"
                      className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
                    >

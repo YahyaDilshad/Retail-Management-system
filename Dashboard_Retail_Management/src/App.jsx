@@ -18,6 +18,8 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from './lib/axios.js';
 import Staff from './pages/staff.jsx' 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 
 const App = () => {
   const location = useLocation();
@@ -44,6 +46,7 @@ const App = () => {
 
   return (
     <div className='relative flex'>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" /> 
       {!hideSidebar && <aside className="hidden md:block"><Sidebar /></aside>}
 
       <main className="flex-1">
