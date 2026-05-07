@@ -34,7 +34,7 @@ const Sidebar = () => {
 
   }
   return (
-    <aside className="w-[20%] bg-[#0e6d65] text-white h-screen flex flex-col fixed left-0 top-0">
+    <aside className="w-60 bg-[#0e6d65] text-white h-screen flex flex-col fixed left-0 top-0">
       {/* Logo Section */}
       <Link to='/admin' className="flex items-center justify-center gap-2 px-5 mt-5">
         <div className="bg-[#ffffff4d] p-2 rounded-lg">
