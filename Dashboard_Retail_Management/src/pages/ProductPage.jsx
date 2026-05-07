@@ -253,8 +253,7 @@
       <header className="w-full relative">
           <div className="px-6 mt-10 py-5 relative  z-999 flex items-center justify-between">
             <h1 className="font-bold text-4xl">All Products</h1>
-
-            <div className=" w-[70%] flex items-center gap-2 justify-end">
+          <div className=" w-[70%] flex items-center gap-2 justify-end">
               {/* ---------- Search Bar ---------- */}
         <header className="px-6 py-5 w-fit flex items-center justify-between">
           <input
@@ -262,7 +261,7 @@
             value={searchItem}
             placeholder="Search product..."
             onChange={(e) => setSearchItem(e.target.value)}
-            className="border outline-none border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#20B0A4]"
+            className="border border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#20B0A4]"
           />
         </header>
               {/* Add Brand Icon */}
@@ -375,9 +374,9 @@
       <div className="w-full  overflow-hidden shadow-sm rounded-lg  ">
          {/* ---------- Add Product Form ---------- */}
           <div className={`transition-all duration-300 ${
-              showProductForm ? "mt-5" : "mt-[-33.5%]"
+              showProductForm ? "mt-5" : "lg:mt-[-29.5%]"
             } w-full `}>
-          <div className="m-5 p-10 border-gray-200 border-1 rounded-lg bg-white ">
+          <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
             <h1 className="text-xl mb-3">Add New Product</h1>
 
             <form
