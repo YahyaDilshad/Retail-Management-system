@@ -249,7 +249,7 @@
   }
     // ---------- JSX ----------
     return (
-      <div className="w-full pl-60 h-screen  bg-[#F8FAFC]">
+      <div className="flex-1 ml-60 min-h-screen bg-[#F8FAFC] transition-all duration-300">
       <header className="w-full relative">
           <div className="px-6 mt-10 py-5 relative flex items-center justify-between">
             <h1 className="font-bold text-4xl">All Products</h1>
