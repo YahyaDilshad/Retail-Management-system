@@ -266,7 +266,7 @@
            <div className="w-full  overflow-hidden shadow-sm rounded-lg  ">
               {/* ---------- Add Product Form ---------- */}
                <div className={`transition-all ${
-                   showstaffForm ? "h-140" : "h-0"
+                   showstaffForm ? "h-[65vh]" : "h-0"
                  } w-full overflow-hidden  `}>
                <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
                  <h1 className="text-xl mb-3">Add New Staff</h1>
