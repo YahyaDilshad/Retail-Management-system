@@ -249,9 +249,9 @@
   }
     // ---------- JSX ----------
     return (
-      <div className="w-[81%]  top-0 absolute left-60 h-screen  bg-[#F8FAFC]">
+      <div className="w-full pl-60 h-screen  bg-[#F8FAFC]">
       <header className="w-full relative">
-          <div className="px-6 mt-10 py-5 relative  z-999 flex items-center justify-between">
+          <div className="px-6 mt-10 py-5 relative flex items-center justify-between">
             <h1 className="font-bold text-4xl">All Products</h1>
           <div className=" w-[70%] flex items-center gap-2 justify-end">
               {/* ---------- Search Bar ---------- */}
@@ -374,8 +374,8 @@
       <div className="w-full  overflow-hidden shadow-sm rounded-lg  ">
          {/* ---------- Add Product Form ---------- */}
           <div className={`transition-all duration-300 ${
-              showProductForm ? "mt-5" : "lg:mt-[-29.5%]"
-            } w-full `}>
+              showProductForm ? "mt-5" : "mt-[-34.5%]"
+            } w-full h-20%  `}>
           <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
             <h1 className="text-xl mb-3">Add New Product</h1>
 
@@ -456,7 +456,7 @@
               />
               </div>
               </div>
-              <div className="flex gap-3 pt-5 justify-end w-60 ">
+              <div className="flex gap-3 pt-5  w-55 ">
               <button
                 type="submit"
                 className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
