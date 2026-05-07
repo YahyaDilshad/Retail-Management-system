@@ -7,8 +7,7 @@ export const newUser = async({
     role
 })=>{
     const user  = await User.create({
-        username,
-        email,
+        identifier,
         password,       
         role,
     })
