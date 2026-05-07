@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Link, Routes,Route, useLocation, Navigate } from "react-router-dom";
+import { Link, Routes,Route, useLocation, Navigate, NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -30,8 +30,28 @@ import Orders from "../pages/Orders";
 
 const Sidebar = () => {
  
-  const handleAllusers = ()=>{
+  const location = useLocation();
 
+  const isActive = (path) => location.pathname === path
+
+  const navelinks = [
+    { label : "Dashboard" , icon : <BarChart3/> , to : "/admin/dashboard"},
+    { label : "Products" , icon : <Package2 /> , to : "/admin/products"},
+    { label : "Categories" , icon : <Tags/> , to : "/admin/categories"},
+    { label : "Scanner" , icon : <ScanLine/> , to : "/admin/scanner"},
+    { label : "Billing" , icon : <ReceiptCent/> , to : "/admin/billing"},
+    { label : "Stock Management" , icon : <Boxes/> , to : "/admin/stock-management"},
+    { label : "Staff" , icon : <Users/> , to : "/admin/staff"},
+    { label : "Clients" , icon : <UserCheck/> , to : "/admin/client"},
+    { label : "Revenue" , icon : <DollarSign/> , to : "/admin/revenue"},
+    { label : "Staff Attendence" , icon : <Building2/> , to : "/admin/staff-attendence"},
+    { label : "About Us" , icon : <Info/> , to : "/admin/about"},
+    { label : "All User" , icon : <User /> , to : "/admin/all-user"},
+    { label : "Log Out" , icon : <LogOut/> , to : "/admin/signup"},
+  ]
+  const [Selectedfolder, setSelectedfolder] = useState(false)
+  const handleOnclick = () =>{
+    setSelectedfolder(!Selectedfolder)
   }
   return (
     <aside className="w-60 bg-[#0e6d65] text-white lg:h-screen flex flex-col fixed left-0 top-0">
@@ -40,129 +60,25 @@ const Sidebar = () => {
         <div className="bg-[#ffffff4d] p-2 rounded-lg">
           <LayoutDashboard   size={24} />
         </div>
-  <h1 className="text-10  text-white">Apexiums Retail Management</h1>
+        <h1 className="text-10  text-white">Apexiums Retail Management</h1>
       </Link>
 
       {/* Menu Links */}
-      <nav className="flex-1 px-3 py-6 space-y-2">
-        
+     <nav className="flex-1 px-3 py-6 space-y-2">
+        {navelinks.map((link) => (
           <Link
-           className={`flex items-center  text-white hover:bg-[#ffffff4d] gap-2  px-4 py-1.5 rounded-lg transition-all`}
-           to="/admin/dashboard"
+            key={link.to}
+            to={link.to}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-[#ffffff4d] ${
+              isActive(link.to) ? "bg-[#ffffff4d] text-white" : "text-white"
+            }`}
           >
-            <span><BarChart3/></span>
-            <span className="text-10">Dashboard</span>
+            <span>{link.icon}</span>
+            <span className="text-[15px] font-bold">{link.label}</span>
           </Link>
-        
-          <Link
-           className={`flex items-center  text-white hover:bg-[#ffffff4d]    gap-3 px-4 py-1.5 rounded-lg transition-all`}
-           to="/admin/products"
-          >   
-            <span><Package2/></span>
-            <span>Products</span>
-          </Link>
-        
-          <Link
-           className={`flex items-center  text-white hover:bg-[#ffffff4d]    gap-3 px-4 py-1.5 rounded-lg transition-all`}
-           to="/admin/categories"
-          >
-            <span><Tags/></span>
-            <span  className="text-10">Categories</span>
-          </Link>
-        
-          <Link
-           className={`flex items-center  text-white hover:bg-[#ffffff4d]    gap-3 px-4 py-1.5 rounded-lg transition-all`}
-           to="/admin/Scanner"  
-          >
-            <span><ScanLine/></span>
-            <span  className="text-10">Scanner</span>
-          </Link>
-        
-          <Link
-           className={`flex items-center  text-white hover:bg-[#ffffff4d]    gap-3 px-4 py-1.5 rounded-lg transition-all`}
-           to='/admin/billing'
-          >
-            <span><ReceiptCent/></span>
-            <span  className="text-10">Billing</span>
-          </Link>
-        
-          <Link
-           className={`flex items-center text-white hover:bg-[#ffffff4d]  gap-3 px-4 py-1.5  rounded-lg transition-all`}
-           to="/admin/stock-management"
-          >
-            <span><Boxes/></span>
-            <span  className="text-10">Stock Management</span>
-          </Link>
-        
-          <Link
-           className={`flex items-center text-white hover:bg-[#ffffff4d]  gap-3 px-4 py-1.5  rounded-lg transition-all`}
-           to='/admin/staff'
-          > 
-            <span><Users/></span>
-            <span  className="text-10">Staff</span>
-          </Link>
-          <Link
-           className={`flex items-center text-white hover:bg-[#ffffff4d]  gap-3 px-4 py-1.5  rounded-lg transition-all`}
-           to='/admin/notification'
-          > 
-            <span><Bell/></span>
-            <span  className="text-10">Notifications</span>
-          </Link>
-          <Link
-           className={`flex items-center text-white hover:bg-[#ffffff4d]  gap-3 px-4 py-1.5  rounded-lg transition-all`}
-           to='/admin/agencies'
-          > 
-            <span><Building2/></span>
-            <span  className="text-10">Agencies</span>
-          </Link>
-          <Link
-           className={`flex items-center text-white hover:bg-[#ffffff4d]  gap-3 px-4 py-1.5  rounded-lg transition-all`}
-           to='/admin/Clients'
-          > 
-            <span><UserCheck/></span>
-            <span  className="text-10">Clients</span>
-          </Link>
-          <Link
-           className={`flex items-center text-white hover:bg-[#ffffff4d]  gap-3 px-4 py-1.5  rounded-lg transition-all`}
-           to='/admin/Revenue'
-          > 
-            <span><DollarSign/></span>
-            <span  className="text-10">Revenue</span>
-          </Link>
-          <Link
-           className={`flex items-center text-white hover:bg-[#ffffff4d]  gap-3 px-4 py-1.5  rounded-lg transition-all`}
-           to='/admin/staff-attendance'
-          > 
-            <span><CalendarCheck/></span>
-            <span  className="text-10">Staf Attendance</span>
-          </Link>
-          <Link
-           className={`flex items-center text-white hover:bg-[#ffffff4d]  gap-3 px-4 py-1.5  rounded-lg transition-all`}
-           to='/admin/about-us'
-          > 
-            <span><Info/></span>
-            <span  className="text-10">About Us</span>
-          </Link>
-        
-          <Link
-          onClick={handleAllusers}
-           className={`flex items-center text-white hover:bg-[#ffffff4d] gap-3 px-4 py-1.5 rounded-lg transition-all`}
-           to='/admin/all-users'
-          >
-            <span><User /></span>
-            <span  className="text-10">All Users</span>
-          </Link>
-          <Link
-          onClick={handleAllusers}
-           className={`flex items-center text-white hover:bg-[#ffffff4d] gap-3 px-4 py-1.5 rounded-lg transition-all`}
-           to='/admin/all-users'
-          >
-            <span><LogOut/>
-          </span>
-            <span  className="text-10">Sign Up</span>
-          </Link>
-    
+        ))}
       </nav>
+
     </aside>
   );
 };
