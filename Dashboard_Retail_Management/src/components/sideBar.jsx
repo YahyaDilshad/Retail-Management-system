@@ -54,13 +54,13 @@ const Sidebar = () => {
     setSelectedfolder(!Selectedfolder)
   }
   return (
-    <aside className="w-60 bg-[#0e6d65] text-white lg:h-screen flex flex-col fixed left-0 top-0">
+    <aside className="w-60 z-999 bg-white text-[#b9b9b9] lg:h-screen flex flex-col border-r-1 border-[#D1D5DB] fixed left-0 top-0">
       {/* Logo Section */}
       <Link to='/admin' className="flex items-center justify-center gap-2 px-5 mt-5">
-        <div className="bg-[#ffffff4d] p-2 rounded-lg">
+        <div className="bg-[#E8F7F6] text-[#20B0A4] p-2 rounded-lg">
           <LayoutDashboard   size={24} />
         </div>
-        <h1 className="text-10  text-white">Apexiums Retail Management</h1>
+        <h1 className="text-10  text-[#20B0A4]">Apexiums Retail Management</h1>
       </Link>
 
       {/* Menu Links */}
@@ -69,8 +69,8 @@ const Sidebar = () => {
           <Link
             key={link.to}
             to={link.to}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-[#ffffff4d] ${
-              isActive(link.to) ? "bg-[#ffffff4d] text-white" : "text-white"
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-[#E8F7F6] ${
+              isActive(link.to) ? "bg-[#E8F7F6] text-[#20B0A4]" : "text-[#4B5563]"
             }`}
           >
             <span>{link.icon}</span>
