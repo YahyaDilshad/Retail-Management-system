@@ -91,7 +91,7 @@ const Sidebar = () => {
            handleLogout()
           }}
         >
-          <Span><LogOut/></Span>
+          <span><LogOut/></span>
           <span className="text-[15px] font-bold">Log Out</span>
 
         </Link>
