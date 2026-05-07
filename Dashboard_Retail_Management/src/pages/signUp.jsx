@@ -70,7 +70,7 @@ const SignUp = () => {
             <Home size={10} className="w-15 h-15 p-3 mb-5  rounded-full   bg-[#ffffff42] text-white" />
             <div className="text-white text-2xl mb-2 font-semibold">Apexiums Retail Management</div>
             <p className="text-white mb-6">
-              Create your account to get started with us
+              Sign In Your Account
             </p>
         </div>
         </div>
@@ -128,21 +128,11 @@ const SignUp = () => {
 
           <button
             type="submit"
-            className="cursor-pointer w-full p-3 mt-4 text-white bg-[#20B0A4] rounded-md"
+            className="cursor-pointer w-full p-3 mt-4 mb-7 text-white bg-[#20B0A4] rounded-md"
           >
             {signUpResult.isPending ? "Signing up..." : "Sign Up"}
           </button>
         </form>
-
-        <p className="text-sm ml-5 mb-10 text-gray-600 mt-6">
-          Already have an account?{" "}
-          <Link
-            to="/admin/signin"
-            className="text-[#20B0A4] font-medium hover:underline"
-          >
-            Sign in
-          </Link>
-        </p>
       </div>  
     </div>
   );
