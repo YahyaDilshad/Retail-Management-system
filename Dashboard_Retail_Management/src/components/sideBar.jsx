@@ -27,11 +27,12 @@ import {
 
 } from "lucide-react";
 import Orders from "../pages/Orders";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Sidebar = () => {
  
   const location = useLocation();
-
+  
   const isActive = (path) => location.pathname === path
 
   const navelinks = [
@@ -47,12 +48,19 @@ const Sidebar = () => {
     { label : "Staff Attendence" , icon : <Building2/> , to : "/admin/staff-attendence"},
     { label : "About Us" , icon : <Info/> , to : "/admin/about"},
     { label : "All User" , icon : <User /> , to : "/admin/all-user"},
-    { label : "Log Out" , icon : <LogOut/> , to : "/admin/signup"},
   ]
   const [Selectedfolder, setSelectedfolder] = useState(false)
   const handleOnclick = () =>{
     setSelectedfolder(!Selectedfolder)
   }
+  
+  const queryClient = useQueryClient()
+  
+  const handleLogout = () => {
+    queryClient.clear("authUser")
+    navigate("/admin/signUp");
+  };
+
   return (
     <aside className="w-60 z-999 bg-white text-[#b9b9b9] lg:h-screen flex flex-col border-r-1 border-[#D1D5DB] fixed left-0 top-0">
       {/* Logo Section */}
@@ -77,6 +85,16 @@ const Sidebar = () => {
             <span className="text-[15px] font-bold">{link.label}</span>
           </Link>
         ))}
+        <Link
+         className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-[#E8F7F6] `}
+         onClick={()=>{
+           handleLogout()
+          }}
+        >
+          <Span><LogOut/></Span>
+          <span className="text-[15px] font-bold">Log Out</span>
+
+        </Link>
       </nav>
 
     </aside>

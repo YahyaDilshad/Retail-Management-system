@@ -8,9 +8,9 @@ import { Bell } from "lucide-react";
 const Header = () => {
   const navigate = useNavigate();
 
-  const { logout, authuser } = useauthstore();
   const [showMenu, setShowMenu] = useState(false);
-
+  
+  const { logout, authuser } = useauthstore();
   const handleLogout = () => {
     logout();
     localStorage.removeItem("authuser");
@@ -22,7 +22,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-end">
         <div className="relative  right-0 ">
           <button
-            onClick={() => setShowMenu(!showMenu)}
+           // onClick={() => setShowMenu(!showMenu)}
             className="flex items-center gap-2 focus:outline-none"
           > <Bell className="text-2xl text-black" />
           </button>
