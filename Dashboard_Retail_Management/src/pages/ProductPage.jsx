@@ -168,7 +168,6 @@
         toast.error("Category must be selected");
         return false;
       }
-      console.log('categoryName' , brandData.categoryName)
       return true;
     };
     
@@ -251,7 +250,7 @@
     return (
       <div className="flex-1 ml-60 min-h-screen bg-[#F8FAFC] transition-all duration-300">
       <header className="w-full relative">
-          <div className="px-6 mt-10 py-5 relative flex items-center justify-between">
+          <div className="px-6  py-5 relative flex items-center justify-between">
             <h1 className="font-bold text-4xl">All Products</h1>
           <div className=" w-[70%] flex items-center gap-2 justify-end">
               {/* ---------- Search Bar ---------- */}
@@ -290,16 +289,20 @@
          
 
           {/* ---------- Add Brand Form ---------- */}
-          {/* <div
-            className={`absolute transition-all duration-300 ${
-              showBrandForm ? "top-17" : "top-[-200%]"
-            } w-full p-5 rounded-xl bg-[#f8f6f6]`}
-          >
-            <h1 className="text-xl mb-3">Add New Brand</h1>
+
+          <div className={`transition-all ${
+              showBrandForm ? "h-90" : "h-0"
+            } w-full overflow-hidden  `}>
+          <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
+            <h1 className="text-xl mb-3">Add New Product</h1>
+
             <form
               onSubmit={handleBrand}
-              className="py-5 w-full rounded flex items-center flex-wrap gap-2"
+              className="py-5 w-full rounded flex items-center flex-wrap gap-6"
             >
+              <div>
+                <h3 className="text-[#4B5563]">Brand Name</h3>
+
               <input
                 name="name"
                 placeholder="Brand Name"
@@ -308,21 +311,27 @@
                   setBrandData({ ...brandData, brandName: e.target.value })
                 }
                 className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
+                />
+              </div>
 
               {/* Category dropdown */}
-              {/* <select
+              <div>
+                <h3 className="text-[#4B5563]">Category</h3>
+              <select
                 name="categoryName"
                 value={brandData.categoryName}
                 onChange={(e) => setBrandData({...brandData, categoryName: e.target.value})}
-                className="..."
-              >
+                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+                >
                 <option value="">Select Category</option>
                 {FetchCategoryArray.categories?.map((cat) => (
                   <option key={cat.id} value={cat.categoryName}>{cat.categoryName}</option>
                 ))}
               </select>
-
+            </div>
+             <div>
+              <h3 className="text-[#4B5563]">Image</h3>
+              <div className="border-[#cfcfcfda] border rounded p-1 w-50 mb-2">
               <input
                 type="file"
                 accept="image/*"
@@ -330,16 +339,99 @@
                   setBrandData({ ...brandData, Image: e.target.files[0] })
                 }
                 className="mb-2"
-              />
+                />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-5  w-150 ">
               <button
                 type="submit"
-                className="cursor-pointer bg-gray-800 text-white px-4 py-2 rounded"
+                className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
               >
-                Add Brand
-              </button>
+                Add New Brand
+              </button> 
+              <button
+                onClick={() => setShowBrandForm((prev) => !prev)}
+                type="submit"
+                className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
+              >
+                  Cancel
+              </button> 
+            </div>
             </form>
-          </div> */}
+          </div>
+          </div>
+             {/* ---------- Add Brand Form ---------- */}
 
+          <div className={`transition-all ${
+              showCategoryForm ? "h-90" : "h-0"
+            } w-full overflow-hidden  `}>
+          <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
+            <h1 className="text-xl mb-3">Add New Category</h1>
+
+            <form
+              onSubmit={handleCategory}
+              className="py-5 w-full rounded flex items-center flex-wrap gap-6"
+            >
+              <div>
+                <h3 className="text-[#4B5563]">Brand Name</h3>
+
+              <input
+                name="name"
+                placeholder="Brand Name"
+                value={categoryData.categoryName}
+                onChange={(e) =>
+                  setCategoryData({ ...categoryData, categoryName: e.target.value })
+                }
+                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+                />
+              </div>
+
+              {/* Category dropdown */}
+              <div>
+                <h3 className="text-[#4B5563]">Category</h3>
+              <select
+                name="categoryName"
+                value={brandData.categoryName}
+                onChange={(e) => setBrandData({...brandData, categoryName: e.target.value})}
+                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
+                >
+                <option value="">Select Category</option>
+                {FetchCategoryArray.categories?.map((cat) => (
+                  <option key={cat.id} value={cat.categoryName}>{cat.categoryName}</option>
+                ))}
+              </select>
+            </div>
+             <div>
+              <h3 className="text-[#4B5563]">Image</h3>
+              <div className="border-[#cfcfcfda] border rounded p-1 w-50 mb-2">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setBrandData({ ...brandData, Image: e.target.files[0] })
+                }
+                className="mb-2"
+                />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-5  w-150 ">
+              <button
+                type="submit"
+                className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
+              >
+                Add New Brand
+              </button> 
+              <button
+                onClick={() => setShowBrandForm((prev) => !prev)}
+                type="submit"
+                className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
+              >
+                  Cancel
+              </button> 
+            </div>
+            </form>
+          </div>
+          </div>
           {/* ---------- Add Category Form ---------- */}
           {/* <div
             className={`absolute transition-all duration-300 ${

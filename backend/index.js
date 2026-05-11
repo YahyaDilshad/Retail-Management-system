@@ -10,7 +10,7 @@ import brandRoutes from "./router/brandRoute.js";
 import productRoutes from "./router/productRoute.js";
 import authuser from "./router/userRouter.js";
 import staff from "./router/Staff.router.js";
-
+import notifiactionRoute from "./router/NotificationRoute.js"
 const app = express();
 
 app.use(cookieParser());
@@ -42,7 +42,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/staff", staff);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/brands", brandRoutes);
-
+app.use("/api/notification", notifiactionRoute)
 // global error handler
 app.use((err, req, res, next) => {
   console.error(err);

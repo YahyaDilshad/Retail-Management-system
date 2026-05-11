@@ -4,14 +4,14 @@ import { Home } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../lib/axios";
 import { toast } from "react-toastify";
+import { requestNotificationPermissionAndgetToken } from "../config/notificationService";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient()
   const [Showpassword, setShowpassword] = useState(false);
   const [Formdata, setFormdata] = useState({
-    username : "",
-    email: "",
+    identifier : "",
     password: "",
     role: "admin",
   });
@@ -20,6 +20,11 @@ const SignUp = () => {
     mutationFn : async(payload)=>{
       console.log("User SignUp" , payload)
       const res = await axiosInstance.post("/auth/signup", payload)
+      if(res.data.success){
+        let userId = res.data.user.id
+        console.log(userId)
+        requestNotificationPermissionAndgetToken(userId)
+      }
       console.log("hiting api",res)
     },onSuccess: ()=>{
         queryClient.invalidateQueries(["authUser"])      
@@ -80,7 +85,7 @@ const SignUp = () => {
           <div className="flex gap-3 w-full">
             <div className="flex-1">
               <label className="text-sm font-medium text-gray-700">
-                Email/Password
+                Email/Username
               </label>
               <input
                 onChange={(e) =>

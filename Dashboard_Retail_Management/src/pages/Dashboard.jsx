@@ -31,15 +31,15 @@ const Dashboard = () => {
       }
 
     ]
-  })
+  })  
 
   const TotalProductsArray = result[0]?.data || []
   const TotalCategories = result[1].data?.categories || []
   const totalStaffArray = result[2].data?.data || []
   console.log(totalStaffArray.length)
   return (
-    <div className='w-[80%] absolute left-64  h-screen'>
-      <h1 className='text-3xl mt-20 font-bold  ml-10'>Overview</h1>
+    <div className=' flex-1 ml-60 min-h-screen bg-[#F8FAFC]'>
+      <h1 className='text-3xl font-bold  ml-10'>Overview</h1>
       <div className='flex flex-wrap gap-5 p-10'>
          <div className={`w-75 p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
           <div className='flex items-center flex-row-reverse justify-between'>

@@ -6,11 +6,13 @@ export const newUser = async({
     password,
     role
 })=>{
-    const user  = await User.create({
-        identifier,
-        password,       
-        role,
-    })
-    const token = jwt.sign({ id : user.id , role: user.role }, process.env.JWT_SECRET);
-    return {user , token};
-}
+    const  user  = await User.create({
+        username: identifier || "",
+        email: identifier || "",
+        password,
+        role
+
+        })
+        const token = jwt.sign({ id : user.id , role: user.role }, process.env.JWT_SECRET);
+        return {user , token};
+    };

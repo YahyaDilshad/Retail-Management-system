@@ -23,15 +23,14 @@ export const sequelize = process.env.DB_URI
       }
     );
 
-  console.log("DB_USER" , process.env.DB_USER)
-  console.log("DB_PASSWORD" , process.env.DB_PASSWORD)
-  console.log("DB_URI" , process.env.DB_URI)
   const start = async () => {
   try {
     await sequelize.authenticate();
     console.log("✅ DB Connected");
     // await sequelize.query("SET FOREiGN_KEY_CHECKS = 0")
     await sequelize.sync();
+    //await sequelize.sync({ alter: true });
+    // await sequelize.sync({force : true});
     // await sequelize.query("SET FOREiGN_KEY_CHECKS = 1")
     console.log("Tables Created");
   } catch (err) {

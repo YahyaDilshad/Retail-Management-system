@@ -109,6 +109,14 @@ async function sendNotification(token, template) {
           },
         },
       },
+      webPush :{
+        urgency : "high",
+        notification : {
+          title : template.title || "New Notification",
+          body : template.message || "you have a new notification update",
+          icon : template.icon || "https://www.flaticon.com/free-icon/notification_2645890?term=notification&related_id=2645890"
+        }
+      }
     };
     
     const response = await messaging.send(message);
@@ -146,7 +154,7 @@ async function sendNotificationToMultiple(tokens,  payload) {
       data: payload.data || {},
     };
     // send message to all users 
-    const response  = await messaging.sendMulticast(message);
+    const response  = await messaging.sen(message);
 
     // Check results
     const results = {

@@ -155,7 +155,7 @@
     return (
      <div className="flex-1 ml-60 min-h-screen bg-[#F8FAFC] transition-all duration-300">
            <header className="w-full relative">
-               <div className="px-6 mt-10 py-5 relative flex items-center justify-between">
+               <div className="px-6 py-5 relative flex items-center justify-between">
                  <h1 className="font-bold text-3xl">Staff Management</h1>
                <div className=" w-[70%] flex items-center gap-2 justify-end">
                    {/* ---------- Search Bar ---------- */}

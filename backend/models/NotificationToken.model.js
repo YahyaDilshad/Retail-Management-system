@@ -5,6 +5,7 @@ export const Notification = sequelize.define("Notification", {
   orderId :{
     type : DataTypes.INTEGER,
   },
+  
   Title: {
     type: DataTypes.STRING
   },
@@ -12,13 +13,16 @@ export const Notification = sequelize.define("Notification", {
     type: DataTypes.STRING
   },
   ImageUrl: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
+    defaultValue : null
   },
   NotificationType: {
-    type: DataTypes.STRING
+    type: DataTypes.ENUM("login_alert"  , "logout_alert", "Promotion" , "Order_Recommendation" , "Product_Recommendation"),
+    defaultValue : "Promotion"
   },
   deliveryStatuswebsocketsent: {
-    type: DataTypes.BOOLEAN
+    type: DataTypes.BOOLEAN,
+    defaultValue : false
   },
   expiresAt: {
     type: DataTypes.DATE

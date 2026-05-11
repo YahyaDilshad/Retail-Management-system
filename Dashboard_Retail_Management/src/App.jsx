@@ -20,6 +20,13 @@ import axiosInstance from './lib/axios.js';
 import Staff from './pages/staff.jsx' 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
+import Categories from './pages/Categories.jsx';
+import StockManagement from './pages/StockManagement.jsx';
+import About from './pages/About.jsx';
+import StockAttendence from './pages/Stock-Attendence.jsx';
+import Biling from './pages/Biling.jsx';
+import Revenue from './pages/Revenue.jsx';
+import Scanner from './pages/Scanner.jsx';
 
 const App = () => {
   const location = useLocation();
@@ -61,9 +68,19 @@ const App = () => {
           <Route path='/admin/all-users' element={user ? <Users /> :  <Navigate to='/admin/signin' />}/>
           <Route path='/admin/staff' element={user ? <Staff /> :  <Navigate to='/admin/signin' />}/>
           <Route path='/admin/dashboard' element={user ? <Dashboard />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/categories' element={user ? <Categories />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/stock' element={user ? <StockManagement />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/client-review' element={user ? <ClientReviews />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/settings' element={user ? <Setting />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/sales-reports' element={user ? <SalesReports />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/about' element={user ? <About />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/staff-attendence' element={user ? <StockAttendence />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/billing' element={user ? <Biling />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/revenue' element={user ? <Revenue />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/scanner' element={user ? <Scanner />:  <Navigate to='/admin/signin' />}/>
 
           {/* Fallback route - Sirf galat URL par chalega */}
-          <Route path='*' element={user ? <Navigate to='/admin/' /> : <Navigate to='/admin/signUp' />} />
+          <Route path='*' element={user ? <Navigate to='/admin/dashboard' /> : <Navigate to='/admin/signUp' />} />
         </Routes>
       </main>
     </div>
