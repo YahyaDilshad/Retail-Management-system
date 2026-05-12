@@ -44,39 +44,39 @@ const Dashboard = () => {
          <div className={`w-75 p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
           <div className='flex items-center flex-row-reverse justify-between'>
           <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
-          <Package className='w-12 h-12 text-[#4DC0B6]'/>
+          <Package className='w-12 h-12 text-[#13786E]'/>
           </div>
           <h3 className='text-md text-gray-400 font-semibold '>Total Products</h3>
           </div>
           <p className='text-3xl font-bold'>{TotalProductsArray.length}</p>
-          <div className='mt-4 flex items-center gap-1 text-[#4DC0B6] '>
-            <TrendingUp className='text-[#4DC0B6]'/>
+          <div className='mt-4 flex items-center gap-1 text-[#13786E] '>
+            <TrendingUp className='text-[#13786E]'/>
             <p>Manage Product Records</p>
           </div>
          </div>
          <div className={`w-75 p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
           <div className='flex items-center flex-row-reverse justify-between'>
          <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
-          <Grid2X2 className='w-12 h-12 text-[#4DC0B6]'/>
+          <Grid2X2 className='w-12 h-12 text-[#13786E]'/>
           </div>
           <h3 className='text-md text-gray-400 font-semibold '>Total Categories</h3>
          </div>
           <p className='text-3xl font-bold'>{TotalCategories.length}</p>
-          <div className='mt-4 flex items-center gap-1 text-[#4DC0B6] '>
-            <TrendingUp className='text-[#4DC0B6]'/>
+          <div className='mt-4 flex items-center gap-1 text-[#13786E] '>
+            <TrendingUp className='text-[#13786E]'/>
             <p>Manage Category Records</p>
           </div>
          </div>
          <div className={`w-75 p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
           <div className='flex items-center flex-row-reverse justify-between'>
          <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
-          <Package className='w-12 h-12 text-[#4DC0B6]'/>
+          <Package className='w-12 h-12 text-[#13786E]'/>
           </div>
           <h3 className='text-md text-gray-400 font-semibold '>Total Staff</h3>
          </div>
           <p className='text-3xl font-bold'>{totalStaffArray.length}</p>
-          <div className='mt-4 flex items-center gap-1 text-[#4DC0B6] '>
-            <TrendingUp className='text-[#4DC0B6]'/>
+          <div className='mt-4 flex items-center gap-1 text-[#13786E] '>
+            <TrendingUp className='text-[#13786E]'/>
             <p>Manage Staff Records</p>
           </div>
          </div>

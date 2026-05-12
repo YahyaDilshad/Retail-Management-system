@@ -165,13 +165,13 @@
                  value={searchItem}
                  placeholder="Search Staff..."
                  onChange={(e) => setSearchItem(e.target.value)}
-                 className="border border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#20B0A4]"
+                 className="border border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#13786E]"
                />
              </header>
                    {/* Add Staff Button */}
                    <div
                      onClick={() => setShowstaffForm((prev) => !prev)}
-                     className="btn bg-[#20B0A4] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
+                     className="btn bg-[#13786E] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
                    >
                      <Plus />
                      <button>Add Staff</button>
@@ -323,14 +323,14 @@
                    <button
                     disabled={CreateStaffArray.isLoading}
                      type="submit"
-                     className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
+                     className="cursor-pointer bg-[#13786E] text-white px-4 py-2 mr-0 rounded"
                    >
                      {CreateStaffArray.isLoading ? <Loader className="animate-spin"/> : "Add Staff"}
                    </button> 
                    <button
                      onClick={() => setShowstaffForm((prev) => !prev)}
                      type="submit"
-                     className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
+                     className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#13786E] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
                    >
                        Cancel
                    </button> 

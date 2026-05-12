@@ -77,13 +77,13 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="w-60 overflow-y-auto z-999 bg-white text-[#b9b9b9] lg:h-screen flex flex-col border-r-1 border-[#D1D5DB] fixed left-0 top-0">
+    <aside className="w-60 overflow-y-auto z-999 bg-[#13786E] text-[#b9b9b9] lg:h-screen flex flex-col border-r-1 border-[#D1D5DB] fixed left-0 top-0">
       {/* Logo Section */}
       <Link to='/admin' className="flex items-center justify-center gap-2 px-5 mt-5">
-        <div className="bg-[#E8F7F6] text-[#20B0A4] p-2 rounded-lg">
+        <div className="bg-[#ffffff52] text-white p-2 rounded-lg">
           <LayoutDashboard size={24} />
         </div>
-        <h1 className="text-10 text-[#20B0A4]">Apexiums Retail Management</h1>
+        <h1 className="text-10 text-white">Apexiums Retail Management</h1>
       </Link>
 
       {/* Menu Links */}
@@ -92,8 +92,8 @@ const Sidebar = () => {
           <Link
             key={link.to}
             to={link.to}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-[#E8F7F6] ${
-              isActive(link.to) ? "bg-[#E8F7F6] text-[#20B0A4]" : "text-[#4B5563]"
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-white hover:text-[#13786E] ${
+              isActive(link.to) ? "bg-white text-[#13786E]" : "text-white"
             }`}
           >
             <span>{link.icon}</span>
@@ -105,7 +105,7 @@ const Sidebar = () => {
         <button
           onClick={handleLogout}
           disabled={logoutMutation.isPending}
-          className="w-full flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-[#E8F7F6] text-[#4B5563] disabled:opacity-50"
+          className="w-full flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-white hover:text-[#13786E] text-white disabled:opacity-50"
         >
           <span><LogOut/></span>
           <span className="text-[15px] font-bold">

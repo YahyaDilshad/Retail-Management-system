@@ -260,7 +260,7 @@
             value={searchItem}
             placeholder="Search product..."
             onChange={(e) => setSearchItem(e.target.value)}
-            className="border border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#20B0A4]"
+            className="border border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#13786E]"
           />
         </header>
               {/* Add Brand Icon */}
@@ -278,7 +278,7 @@
               {/* Add Product Button */}
               <div
                 onClick={() => setShowProductForm((prev) => !prev)}
-                className="btn bg-[#20B0A4] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
+                className="btn bg-[#13786E] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
               >
                 <Plus />
                 <button>Add Product</button>
@@ -294,7 +294,7 @@
               showBrandForm ? "h-90" : "h-0"
             } w-full overflow-hidden  `}>
           <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
-            <h1 className="text-xl mb-3">Add New Product</h1>
+            <h1 className="text-xl mb-3">Add New Brand</h1>
 
             <form
               onSubmit={handleBrand}
@@ -345,7 +345,7 @@
               <div className="flex gap-3 pt-5  w-150 ">
               <button
                 type="submit"
-                className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
+                className="cursor-pointer bg-[#13786E] text-white px-4 py-2 mr-0 rounded"
               >
                 Add New Brand
               </button> 
@@ -417,7 +417,7 @@
               <div className="flex gap-3 pt-5  w-150 ">
               <button
                 type="submit"
-                className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
+                className="cursor-pointer bg-[#13786E] text-white px-4 py-2 mr-0 rounded"
               >
                 Add New Brand
               </button> 
@@ -551,14 +551,14 @@
               <div className="flex gap-3 pt-5  w-55 ">
               <button
                 type="submit"
-                className="cursor-pointer bg-[#20B0A4] text-white px-4 py-2 mr-0 rounded"
+                className="cursor-pointer bg-[#13786E] text-white px-4 py-2 mr-0 rounded"
               >
                 Add Product
               </button> 
               <button
                 onClick={() => setShowProductForm((prev) => !prev)}
                 type="submit"
-                className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
+                className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#13786E] hover:border-[#13786E] transition-all ease-in   px-4 py-2 mr-0 rounded"
               >
                   Cancel
               </button> 
