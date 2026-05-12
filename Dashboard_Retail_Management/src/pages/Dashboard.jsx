@@ -41,7 +41,7 @@ const Dashboard = () => {
     <div className=' flex-1 ml-60 min-h-screen bg-[#F8FAFC]'>
       <h1 className='text-3xl font-bold  ml-10'>Overview</h1>
       <div className='flex flex-wrap gap-5 p-10'>
-         <div className={`w-75 p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
+         <div className={`w-[30%] h-[12rem] p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
           <div className='flex items-center flex-row-reverse justify-between'>
           <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
           <Package className='w-12 h-12 text-[#13786E]'/>
@@ -54,7 +54,7 @@ const Dashboard = () => {
             <p>Manage Product Records</p>
           </div>
          </div>
-         <div className={`w-75 p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
+         <div className={`w-[30%] h-[12rem] p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
           <div className='flex items-center flex-row-reverse justify-between'>
          <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
           <Grid2X2 className='w-12 h-12 text-[#13786E]'/>
@@ -67,7 +67,7 @@ const Dashboard = () => {
             <p>Manage Category Records</p>
           </div>
          </div>
-         <div className={`w-75 p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
+         <div className={`w-[30%] h-[12rem] p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
           <div className='flex items-center flex-row-reverse justify-between'>
          <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
           <Package className='w-12 h-12 text-[#13786E]'/>
