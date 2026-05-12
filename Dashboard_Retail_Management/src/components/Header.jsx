@@ -44,7 +44,7 @@ const notificationData = result.data || [];
                 <div key={notification.id} className=" px-4 py-2 text-sm border-b border-gray-300 text-gray-700 hover:bg-[#ebeff3]">
                   <h3 className="text-md mb-2">{notification.Title}</h3>
                   <p className="text-md mb-2" >{notification.Message}</p>
-                  <p>{notification.createdAt}</p>
+                  <p>{new Date(notification.createdAt).toDateString()}</p>
                 </div>
               ))}
                <button

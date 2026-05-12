@@ -23,7 +23,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: payload.icon  // Public folder me koi bhi image path
+    icon: payload.icon 
   };
 // this is the browser native function that shows the pop up on the right side of the screen
   self.registration.showNotification(notificationTitle, notificationOptions);

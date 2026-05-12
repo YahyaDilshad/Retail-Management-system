@@ -33,7 +33,6 @@ const SignUp = () => {
   // ✅ Form Validation
   const Formvalidate = () => {
     const { identifier , password } = Formdata;
-
     if (!identifier || !password) {
       toast.error("All fields are required");
       return false;
