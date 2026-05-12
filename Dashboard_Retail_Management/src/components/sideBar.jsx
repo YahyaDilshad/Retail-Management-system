@@ -77,7 +77,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="w-60 overflow-y-auto z-999 bg-[#13786E] text-[#b9b9b9] lg:h-screen flex flex-col border-r-1 border-[#D1D5DB] fixed left-0 top-0">
+    <aside className="w-61 overflow-y-auto z-999 bg-[#13786E] text-[#b9b9b9] lg:h-screen flex flex-col border-r-1 border-[#D1D5DB] fixed left-0 top-0">
       {/* Logo Section */}
       <Link to='/admin' className="flex items-center justify-center gap-2 px-5 mt-5">
         <div className="bg-[#ffffff52] text-white p-2 rounded-lg">
@@ -97,7 +97,7 @@ const Sidebar = () => {
             }`}
           >
             <span>{link.icon}</span>
-            <span className="text-[15px] font-bold">{link.label}</span>
+            <span className="text-[1.2vw] font-bold">{link.label}</span>
           </Link>
         ))}
         
