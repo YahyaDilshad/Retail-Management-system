@@ -1,33 +1,27 @@
 import { uploadToCloudinary } from "../config/Cloudinary.js";
 import { Product } from "../models/product.model.js";
 import { createproduct } from "../services/product.service.js";
-import {Order} from "../models/order.model.js";
-import { Op, where } from "sequelize";
 import { Brand } from "../models/brand.model.js";
+import mongoose from "mongoose";
 
 export const createProduct = async (req, res)=>{
       try {
         const { Name, Price, brandName , Stock, Discount, Description } = req.body;
       // Validation
-        if (!Name || !Price == null || !brandName ) {
+        if (!Name || Price == null || !brandName ) {
           return res.status(400).json({
             success: false,
             message: "Missing required fields (name, price, brandId)",
           });
         }
-        const existingProduct = await Product.findOne({
-            where: { Name : Name }
-          });
+        const existingProduct = await Product.findOne({ Name });
 
           if (existingProduct) {
             return res.status(409).json({
               message: "Product already exists"
             });
           }
-        const fetchExistingBrand = await Brand.findOne({
-          where : { brandName : brandName}  
-         }) 
-         console.log("FetchBrand Data" , fetchExistingBrand)
+        const fetchExistingBrand = await Brand.findOne({ brandName });
          if(!fetchExistingBrand) return res.status(309).send("Cannot Fetch brand")
         // Upload image if available
         let imageUrl = "";
@@ -46,7 +40,7 @@ export const createProduct = async (req, res)=>{
         const product = await createproduct({
           Name,
           Price,
-          brandId : fetchExistingBrand.id,
+          brandId : fetchExistingBrand._id,
           Stock,
           brandName : fetchExistingBrand.brandName, 
           Discount,
@@ -75,11 +69,12 @@ export const updateProduct = async (req,res)=>{
         if(!mongoose.Types.ObjectId.isValid(id)){
             return res.status(400).json({success : false , message : "Invalid ID Format"})
         }
-        const updateProduct = await productModel.findByIdAndUpdate(id , req.body ,
+        const updatedProduct = await Product.findByIdAndUpdate(id , req.body ,
             {new : true,
             runValidators : true
-            }).populate("brand" , "name").populate("category" , "name")
-        res.status(200).json({success : true , message : "Product Updated Successfully" , updateProduct})
+            })
+          if (!updatedProduct) return res.status(404).json({ success: false, message: "Product not found" });
+          res.status(200).json({success : true , message : "Product Updated Successfully" , data: updatedProduct})
         }catch(error){
             res.status(500).json({success : false , message : "Server Error while updating a  Product"})
         }
@@ -89,9 +84,8 @@ export const updateProduct = async (req,res)=>{
 export const deleteProduct =   async (req, res) => {
   try {
        const {id} = req.params;
-    const deleted = await Product.destroy({
-      where : {id : id}
-    });
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ success: false, message: "Invalid ID format" });
+    const deleted = await Product.findByIdAndDelete(id);
    
     if (!deleted) {
         console.log("Product Not Found For Deleting this Id (error in controller file)")
@@ -112,16 +106,16 @@ export const getAllProducts = async (req, res) => {
     const { category, brand, search } = req.query;
     let filter = {};
 
-    if (category) filter.category = category;
-    if (brand) filter.brand = brand;
+    if (category) filter.categoryName = category;
+    if (brand) filter.brandName = brand;
     if (search) {
-      filter[Op.or] = [
-        { name: {[Op.like]: `%${search}%`}},
-        { description: {[Op.like] : `%${search}%`} },
+      filter.$or = [
+        { Name: { $regex: search, $options: "i" } },
+        { Description: { $regex: search, $options: "i" } },
       ];
     }
 
-    const products = await Product.findAll({ where: filter })
+    const products = await Product.find(filter)
 
     res.json({ success: true, count: products.length, data: products });
   } catch (error) {
@@ -134,34 +128,17 @@ export const getProducts = async (req,res)=>{
     try {
         const { categoryName, brandName, search } = req.query;
         let filter = {};
-        if (category) filter.category = category;
-        
-        if(brand && Brand.findByPk(brand)){
-          return res.status(400).json({
-            success: false,
-            message: "Invalid brand ID"
-          });
-        }
-        if (brand) {
-        const brandDoc = await brand.findById(brand);
-
-        if (!brandDoc) {
-          return res.status(400).json({
-            success: false,
-            message: "cannot match brand ID"
-        });
-        }
-
-  filter.brand = brand;
-}
+        if (categoryName) filter.categoryName = categoryName;
+        if (brandName) filter.brandName = brandName;
       if (search) {
-          filter.$or 
+          filter.$or = [
+            { Name: { $regex: search, $options: "i" } },
+            { Description: { $regex: search, $options: "i" } },
+          ];
         }
          console.log("Applied Filter:", filter);
         
-        const products = await productModel.find(filter)
-          .populate("brand","name")
-          .populate("category","name")
+        const products = await Product.find(filter)
           .sort({ createdAt: -1 });
         res.json({ success: true, count: products.length, data: products });
 
@@ -180,9 +157,7 @@ export const getproductById = async (req,res)=>{
           return res.status(400).json({ success: false, message: "Invalid ID format" });
         }
         
-        const product = await productModel.findById(id)
-          .populate("brand", "name")
-          .populate("category", "name");
+        const product = await Product.findById(id);
     
         if (!product) {
           return res.status(404).json({ success: false, message: "Product not found" });

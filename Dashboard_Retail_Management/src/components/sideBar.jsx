@@ -1,120 +1,168 @@
-import React from "react";
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom"; // useNavigate add kiya
-import {
-  LayoutDashboard,
-  BarChart3,
-  LogOut,
-  User,
-  Package2,
-  Tags,
-  ScanLine,
-  ReceiptCent,
-  Users,
-  Building2,
-  UserCheck,
-  DollarSign,
-  Info,
-  Boxes
-} from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "../lib/axios";
-import { toast } from "react-toastify";
+  import React from "react";
+  import { Link, useLocation, useNavigate } from "react-router-dom";
+  import {
+    LayoutDashboard,
+    BarChart3,
+    LogOut,
+    User,
+    Package2,
+    Tags,
+    ScanLine,
+    ReceiptCent,
+    Users,
+    Building2,
+    UserCheck,
+    DollarSign,
+    Info,
+    Boxes,
+    Settings
+  } from "lucide-react";
+  import { useMutation, useQueryClient } from "@tanstack/react-query";
+  import axiosInstance from "../lib/axios";
+  import { toast } from "react-toastify";
 
-const Sidebar = () => {
-  const navigate = useNavigate(); // Redirect karne ke liye hook
-  const queryClient = useQueryClient();
+  const Sidebar = () => {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const location = useLocation();
 
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      // 1. LocalStorage se token nikaalein taake backend se delete kar sakein
-      // Agar aap token ko alag save karte hain to wahan se nikalyein
-      const currentToken = localStorage.getItem("fcmToken"); 
+    const logoutMutation = useMutation({
+      mutationFn: async () => {
+        const currentToken = localStorage.getItem("fcmToken");
+        await axiosInstance.post("/auth/logout", { token: currentToken });
+      },
+      onSuccess: () => {
+        localStorage.removeItem("authUser");
+        localStorage.removeItem("fcmToken");
+        queryClient.clear();
+        toast.success("Logged out successfully");
+        navigate("/login");
+      },
+      onError: () => {
+        toast.error("Logout failed. Please try again.");
+      }
+    });
 
-      // 2. Backend ko logout request bhejein aur token bhi pass karein
-      await axiosInstance.post("/auth/logout", { token: currentToken });
-    },
-    onSuccess: () => {
-      // 3. Clear all auth details from frontend
-      localStorage.removeItem("authUser");
-      localStorage.removeItem("fcmToken"); // Agar token save kiya tha
-      
-      // React Query ka cache clear karein taake purana data leak na ho
-      queryClient.clear();
+    const isActive = (path) => location.pathname === path;
 
-      toast.success("User Logout Successfully!");
-      
-      // 4. Login page par bhejein
-      navigate("/login"); 
-    },
-    onError: (error) => {
-      console.error("Logout error:", error);
-      toast.error("Logout failed. Please try again.");
-    }
-  });
+    // Grouped Links for better Organization
+    const menuGroups = [
+      {
+        group: "Main",
+        links: [
+          { label: "Dashboard", icon: <LayoutDashboard size={20} />, to: "/admin/dashboard" },
+          { label: "Revenue", icon: <DollarSign size={20} />, to: "/admin/revenue" },
+        ]
+      },
+      {
+        group: "Inventory & Sales",
+        links: [
+          { label: "Products", icon: <Package2 size={20} />, to: "/admin/products" },
+          { label: "Categories", icon: <Tags size={20} />, to: "/admin/categories" },
+          { label: "Stock Mgmt", icon: <Boxes size={20} />, to: "/admin/stock" },
+          { label: "Scanner", icon: <ScanLine size={20} />, to: "/admin/scanner" },
+          { label: "Billing", icon: <ReceiptCent size={20} />, to: "/admin/billing" },
+        ]
+      },
+      {
+        group: "Staff & Users",
+        links: [
+          { label: "Staff", icon: <Users size={20} />, to: "/admin/staff" },
+          { label: "Attendance", icon: <Building2 size={20} />, to: "/admin/staff-attendence" },
+          { label: "Clients", icon: <UserCheck size={20} />, to: "/admin/client-review" },
+          { label: "All Users", icon: <User size={20} />, to: "/admin/all-users" },
+        ]
+      },
+      {
+        group: "System",
+        links: [
+          { label: "About Us", icon: <Info size={20} />, to: "/admin/about" },
+        ]
+      }
+    ];
 
-  const location = useLocation();
-  const isActive = (path) => location.pathname === path;
+    return (
+      <aside className="w-64 h-screen bg-[#13786E] text-white fixed left-0 top-0 flex flex-col border-r border-teal-700 shadow-xl z-[999]">
+        
+        {/* Logo Section */}
+        <div className="p-6">
+          <Link to='/admin' className="flex items-center gap-3 group">
+            <div className="bg-white/20 p-2 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-inner">
+              <LayoutDashboard size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-lg leading-tight">Apexiums</h1>
+              <p className="text-[10px] text-teal-200 tracking-widest uppercase">Management</p>
+            </div>
+          </Link>
+        </div>
 
-  const navelinks = [
-    { label: "Dashboard", icon: <BarChart3/>, to: "/admin/dashboard"},
-    { label: "Products", icon: <Package2 />, to: "/admin/products"},
-    { label: "Categories", icon: <Tags/>, to: "/admin/categories"},
-    { label: "Scanner", icon: <ScanLine/>, to: "/admin/scanner"},
-    { label: "Billing", icon: <ReceiptCent/>, to: "/admin/billing"},
-    { label: "Stock Management", icon: <Boxes/>, to: "/admin/stock"},
-    { label: "Staff", icon: <Users/>, to: "/admin/staff"},
-    { label: "Clients", icon: <UserCheck/>, to: "/admin/client-review"},
-    { label: "Revenue", icon: <DollarSign/>, to: "/admin/revenue"},
-    { label: "Staff Attendence", icon: <Building2/>, to: "/admin/staff-attendence"},
-    { label: "About Us", icon: <Info/>, to: "/admin/about"},
-    { label: "All User", icon: <User />, to: "/admin/all-users"},
-  ];
+        {/* Navigation Links with Custom Scrollbar */}
+        <nav className="flex-1 px-4 py-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
+          {menuGroups.map((group, idx) => (
+            <div key={idx} className="mb-6">
+              <h2 className="px-4 text-[11px] font-semibold text-teal-300 uppercase tracking-wider mb-2">
+                {group.group}
+              </h2>
+              <div className="space-y-1">
+                {group.links.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group
+                      ${isActive(link.to) 
+                        ? "bg-white text-[#13786E] shadow-md font-semibold" 
+                        : "hover:bg-white/10 text-teal-50"
+                      }`}
+                  >
+                    {/* Active Indicator Line */}
+                    {isActive(link.to) && (
+                      <span className="absolute left-0 w-1 h-6 bg-[#13786E] rounded-r-full" />
+                    )}
+                    
+                    <span className={`${isActive(link.to) ? "text-[#13786E]" : "text-teal-300 group-hover:text-white"}`}>
+                      {link.icon}
+                    </span>
+                    <span className="text-sm">{link.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </nav>
 
-  const handleLogout = () => {
-    // Mutation trigger karein
-    logoutMutation.mutate();
+        {/* Logout / User Profile Section */}
+        <div className="p-4 border-t border-teal-700 bg-teal-800/30">
+          <button
+            onClick={() => logoutMutation.mutate()}
+            disabled={logoutMutation.isPending}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/20 hover:text-red-300 transition-all duration-200 text-teal-100 group"
+          >
+            <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
+            <span className="text-sm font-medium">
+              {logoutMutation.isPending ? "Logging out..." : "Log Out"}
+            </span>
+          </button>
+        </div>
+
+        {/* Custom CSS logic for Scrollbar (Add to your global CSS if needed) */}
+        <style jsx>{`
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+          }
+          .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+          }
+        `}</style>
+      </aside>
+    );
   };
 
-  return (
-    <aside className="w-61 overflow-y-auto z-999 bg-[#13786E] text-[#b9b9b9] lg:h-screen flex flex-col border-r-1 border-[#D1D5DB] fixed left-0 top-0">
-      {/* Logo Section */}
-      <Link to='/admin' className="flex items-center justify-center gap-2 px-5 mt-5">
-        <div className="bg-[#ffffff52] text-white p-2 rounded-lg">
-          <LayoutDashboard size={24} />
-        </div>
-        <h1 className="text-10 text-white">Apexiums Retail Management</h1>
-      </Link>
-
-      {/* Menu Links */}
-      <nav className="flex-1 px-3 py-6 space-y-2">
-        {navelinks.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-white hover:text-[#13786E] ${
-              isActive(link.to) ? "bg-white text-[#13786E]" : "text-white"
-            }`}
-          >
-            <span>{link.icon}</span>
-            <span className="text-[1.2vw] font-bold">{link.label}</span>
-          </Link>
-        ))}
-        
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          disabled={logoutMutation.isPending}
-          className="w-full flex items-center gap-2 px-4 py-1.5 rounded-lg transition-all hover:bg-white hover:text-[#13786E] text-white disabled:opacity-50"
-        >
-          <span><LogOut/></span>
-          <span className="text-[15px] font-bold">
-            {logoutMutation.isPending ? "Logging out..." : "Log Out"}
-          </span>
-        </button>
-      </nav>
-    </aside>
-  );
-};
-
-export default Sidebar;
+  export default Sidebar;

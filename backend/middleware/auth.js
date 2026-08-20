@@ -2,7 +2,7 @@
 import jwt from "jsonwebtoken";
 
 export const protect = (req, res, next) => {
-  const token = req.cookies.token
+  const token = req.cookies?.token;
 
   if (!token){ 
     console.log("Autherization is denier")

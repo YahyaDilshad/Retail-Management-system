@@ -1,624 +1,283 @@
-  import React, { useEffect, useState } from "react";
-  import useProductStore from "../store/productauthstore";
-  import { toast } from "react-toastify";
-  import { Plus, BadgeCheck, FolderTree, Delete, Trash2, Edit, Loader } from "lucide-react";
-  import {QueryCache, useMutation, useQueries, useQuery, useQueryClient} from "@tanstack/react-query"
-  import Swal from 'sweetalert2';
-  import axiosInstance from "../lib/axios";
-  import { LoaderIcon } from "react-hot-toast";
-  const ProductPage = () => {
-    
-    const [showProductForm, setShowProductForm] = useState(false);
-    const [showCategoryForm, setShowCategoryForm] = useState(false);
-    const [showBrandForm, setShowBrandForm] = useState(false);
-    const [searchItem, setSearchItem] = useState("");
-    
-    const queryClient  = useQueryClient()
-    const CreateProductsResult = useMutation(
-      {
-          mutationFn : async (data) =>{ 
-            console.log("create Data" , data)
-          const res = await axiosInstance.post('/products/create' , data)
-          },
-          onSuccess : ()=>{
-            queryClient.invalidateQueries('Products')
-          }
-      }
-  )
-    const createBrandResluts = useMutation(
-      {
-          mutationFn : async (brandPayload) =>{ 
-            console.log('create Brand Data' , brandPayload.categoryName)
-          const res = await axiosInstance.post('/brands/create' , brandPayload)
-          
-          },onSuccess :() =>{
-            queryClient.invalidateQueries("brands")
-          }
-      }
-  )
-    const createCategoryResults = useMutation(
-      {
-        mutationFn : async(categoryPayload) =>{
-          console.log(categoryPayload)
-          const res = await axiosInstance.post("/categories/create" , categoryPayload)
+import React, { useState } from "react";
+import { 
+  Plus, Trash2, Edit, Loader, Search, 
+  Package, Tag, Bookmark, X, Image as ImageIcon,
+  AlertCircle, CheckCircle2, Upload
+} from "lucide-react";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import Swal from 'sweetalert2';
+import axiosInstance from "../lib/axios";
+import { toast } from "react-toastify";
 
-        },
-        onSuccess : ()=>{
-          queryClient.invalidateQueries('categories')
-        }
-      }
-    )
-    const results = useQueries({
-        queries :[
-          {
-            queryKey : ['Products'],
-            queryFn : async()=>{
-              const res = await axiosInstance.get('/products')
-              
-              return res.data
+const ProductPage = () => {
+  const [activeForm, setActiveForm] = useState(null);
+  const [searchItem, setSearchItem] = useState("");
+  const queryClient = useQueryClient();
 
-            }
-          },
-          {
-            queryKey : ["categories"],
-            queryFn : async()=>{
-              const res = await axiosInstance.get('/categories')
-              return res.data
-            }
-          },
-          // {
-          //   queryKey : ["brands"],
-          //   queryFn : async()=>{
-          //     const res = await axiosInstance.get('/brands')
-          //     return res.data
-          //   }
-          // }
-          // {
-          //   queryKey: ["searchProducts" , searchItem], 
-          //   queryFn : async()=>{
-          //     const res = await axiosInstance.get(`/products/getproducts?search=${searchItem}`)
-          //     return res.data
-          //   }
-          // }
-          
-        ]
-    
-      })
-    
+  // Queries - Fetching all data
+  const results = useQueries({
+    queries: [
+      { queryKey: ['Products'], queryFn: async () => (await axiosInstance.get('/products')).data },
+      { queryKey: ['categories'], queryFn: async () => (await axiosInstance.get('/categories')).data },
+      { queryKey: ['brands'], queryFn: async () => (await axiosInstance.get('/brands')).data }
+    ]
+  });
 
-    const FetchProductsArray = results[0]?.data?.data || []
-    const FetchCategoryArray = results[1]?.data || []
-    // const FetchBrandArray = results[2]?.data || []
-     // nst FetchSearchProducts = results[3].data || []
+  // Safe Data Extraction
+  const products = results[0]?.data?.data || results[0]?.data?.products || [];
   
+  const categoriesList = results[1]?.data?.categories || 
+                         results[1]?.data?.data || 
+                         (Array.isArray(results[1]?.data) ? results[1]?.data : []);
 
-  // --------------Delete Product ------------------
+  const brandsList = results[2]?.data?.brands || 
+                     results[2]?.data?.data || 
+                     (Array.isArray(results[2]?.data) ? results[2]?.data : []);
 
-  const handleDelete = async (id) => {
-    // Custom Confirmation Dialog
+  const isLoading = results.some(r => r.isLoading);
+
+  // Mutations
+  const createProduct = useMutation({
+    mutationFn: (data) => axiosInstance.post('/products/create', data),
+    onSuccess: () => { queryClient.invalidateQueries(['Products']); toast.success("Product Added!"); setActiveForm(null); resetForms(); }
+  });
+
+  const createCategory = useMutation({
+    mutationFn: (data) => axiosInstance.post('/categories/create', data),
+    onSuccess: () => { queryClient.invalidateQueries(['categories']); toast.success("Category Added!"); setActiveForm(null); resetForms(); }
+  });
+
+  const createBrand = useMutation({
+    mutationFn: (data) => axiosInstance.post('/brands/create', data),
+    onSuccess: () => { queryClient.invalidateQueries(['brands']); toast.success("Brand Added!"); setActiveForm(null); resetForms(); }
+  });
+
+  // States
+  const [productForm, setProductForm] = useState({ Name: "", Price: "", Stock: "", Discount: "", brandName: "", Description: "", Image: null });
+  const [catForm, setCatForm] = useState({ categoryName: "" });
+  const [brandForm, setBrandForm] = useState({ brandName: "", categoryName: "", Image: null });
+
+  const resetForms = () => {
+    setProductForm({ Name: "", Price: "", Stock: "", Discount: "", brandName: "", Description: "", Image: null });
+    setCatForm({ categoryName: "" });
+    setBrandForm({ brandName: "", categoryName: "", Image: null });
+  };
+
+  // Handlers
+  const handleProductSubmit = (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    Object.keys(productForm).forEach(key => data.append(key, productForm[key]));
+    createProduct.mutate(data);
+  };
+
+  const handleCategorySubmit = (e) => {
+    e.preventDefault();
+    if(!catForm.categoryName) return toast.error("Category name is required");
+    createCategory.mutate(catForm);
+  };
+
+  const handleBrandSubmit = (e) => {
+    e.preventDefault();
+    if(!brandForm.brandName || !brandForm.categoryName) return toast.error("Fill all brand fields");
+    const data = new FormData();
+    data.append("brandName", brandForm.brandName);
+    data.append("categoryName", brandForm.categoryName);
+    if(brandForm.Image) data.append("Image", brandForm.Image);
+    createBrand.mutate(data);
+  };
+
+  const handleDelete = (id) => {
     Swal.fire({
-      title: "Are you Sure you want to delete this product?",
-      text: "Cannot get product after delete!",
+      title: "Delete Product?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#0e6d65",
-      cancelButtonColor: "#9CA3AF",
-      confirmButtonText: "Produst Delete",
-      cancelButtonText: "cancel"
+      confirmButtonColor: "#13786E",
+      confirmButtonText: "Yes, delete"
     }).then(async (result) => {
-      // Agar user ne 'Haan' (Confirm) par click kiya
       if (result.isConfirmed) {
         try {
-          const res = await axiosInstance.delete(`/products/${id}`)
-        
-          if (res) {
-            queryClient.invalidateQueries(['Products'])
-            // Success Custom Alert
-            Swal.fire({
-              title: "Deleted!",
-              text: "Product delete ho gaya hai.",
-              icon: "success",
-              timer: 1500, // 1.5 seconds baad khud band ho jayega
-              showConfirmButton: false
-            });
-          }
-        } catch (error) {
-          Swal.fire("Error!", "Something Went Wrong.", "error");
-        }
+          await axiosInstance.delete(`/products/${id}`);
+          queryClient.invalidateQueries(['Products']);
+          Swal.fire("Deleted!", "", "success");
+        } catch (error) { toast.error("Delete failed"); }
       }
     });
   };
 
-    // ---------- CATEGORY ----------
-    const [categoryData, setCategoryData] = useState({ categoryName: "" });
+  const filteredProducts = products.filter(p => p.Name?.toLowerCase().includes(searchItem.toLowerCase()));
 
-    const validateCategoryForm = () => {
-      if (!categoryData.categoryName.trim()) {
-        toast.error("Category name is required");
-        return false;
-      }
-      return true;
-    };
-
-    const handleCategory = async (e) => {
-    e.preventDefault();
-    if (!validateCategoryForm()) return;
-    try {
-      await createCategoryResults.mutateAsync({ categoryName: categoryData.categoryName.trim() });
-      setCategoryData({ categoryName: "" });
-      setShowCategoryForm(false);
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Error adding category");
-    }
-    };
-
-    // ---------- BRAND ----------
-    const [brandData, setBrandData] = useState({
-      brandName: "",
-      Image: null,
-      categoryName: "",
-    });
-
-    const validateBrandForm = () => {
-      if (!brandData.brandName.trim()) {
-        toast.error("Brand name is required");
-        return false;
-      }
-      if (!brandData.categoryName.trim()) {
-        toast.error("Category must be selected");
-        return false;
-      }
-      return true;
-    };
-    
-    const handleBrand = async (e) => {
-      e.preventDefault();
-      if (!validateBrandForm()) return;
-
-    const brandPayload = new FormData()
-      brandPayload.append('brandName' , brandData.brandName),
-      brandPayload.append('categoryName' , brandData.categoryName)
+  return (
+    <div className="flex-1 ml-64 min-h-[90%] mt-14 bg-[#F8FAFC] p-8">
       
-      if(brandData.Image) {
-        brandPayload.append("Image" , brandData.Image)
-      }else{
-        return toast.error("Please select an image"); // Image lazmi check karein
-      }
-      await createBrandResluts.mutateAsync(brandPayload);
-      setBrandData({ brandName: "", Image: null, categoryName: "" });
-      setShowBrandForm(false)
-    };
-    
-    // ---------- PRODUCT ----------
-    const [formData, setFormData] = useState({
-      Name: "",
-      Price: "",
-      Stock: "",
-      Discount : "",
-      brandName: "",
-      Description: "",
-      Image: null,
-    });
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Inventory Management</h1>
+          <p className="text-gray-500">Manage Products, Brands, and Categories</p>
+        </div>
 
-    const handleProductFile = (e) => {
-      setFormData({ ...formData, Image: e.target.files[0] });
-    };
-    const handleProductChange = (e) => {
-      const { name, value } = e.target; // Small letters use karein
-      setFormData({ ...formData, [name]: value });
-    };
-
-  const handleSubmitProduct = async (e) => {
-    e.preventDefault();
-    
-    const data = new FormData();
-    
-    // Text fields append karein
-    data.append('Name', formData.Name);
-    data.append('Price', formData.Price);
-    data.append('Stock', formData.Stock);
-    data.append('Discount' , formData.Discount)
-    data.append('brandName', formData.brandName);
-    data.append('Description', formData.Description);
-
-    if (formData.Image) {
-      data.append('Image', formData.Image); 
-    } else {
-      return toast.error("Please select an image"); // Image lazmi check karein
-    }
-
-    try {
-      // Sahi mutation function call karein
-      await CreateProductsResult.mutateAsync(data); 
-      toast.success("✅ Product added successfully!");
-      
-      // Form Reset
-      setFormData({
-        Name: "", Price: "", Stock: "", Category: "", Brand: "", Description: "", Image: null,Discount : ""
-      });
-      setShowProductForm(false);
-    } catch (error) {
-      console.error("Backend Error:", error.response?.data || error.message);
-      toast.error("❌ Failed to add product");
-    }
-  };
-    const isLoading = results.some(r => r.isLoading)
-  if (isLoading) {
-    return <LoaderIcon />;
-  }
-    // ---------- JSX ----------
-    return (
-      <div className="flex-1 ml-60 min-h-screen bg-[#F8FAFC] transition-all duration-300">
-      <header className="w-full relative">
-          <div className="px-6  py-5 relative flex items-center justify-between">
-            <h1 className="font-bold text-4xl">All Products</h1>
-          <div className=" w-[70%] flex items-center gap-2 justify-end">
-              {/* ---------- Search Bar ---------- */}
-        <header className="px-6 py-5 w-fit flex items-center justify-between">
-          <input
-            type="text"
-            value={searchItem}
-            placeholder="Search product..."
-            onChange={(e) => setSearchItem(e.target.value)}
-            className="border border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#13786E]"
-          />
-        </header>
-              {/* Add Brand Icon */}
-              <FolderTree
-                onClick={() => setShowBrandForm((prev) => !prev)}
-                className="text-[20px] p-[1%] cursor-pointer hover:bg-black transition-all duration-200 hover:text-white w-10 bg-gray-100 rounded-full h-10 text-gray-500"
-              />
-
-              {/* Add Category Icon */}
-              <BadgeCheck
-                onClick={() => setShowCategoryForm((prev) => !prev)}
-                className="text-[20px] p-[1%] cursor-pointer hover:bg-black transition-all duration-200 hover:text-white w-10 bg-gray-100 rounded-full h-10 text-gray-500"
-              />
-
-              {/* Add Product Button */}
-              <div
-                onClick={() => setShowProductForm((prev) => !prev)}
-                className="btn bg-[#13786E] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
-              >
-                <Plus />
-                <button>Add Product</button>
-              </div>
-            </div>
-          </div>
-
-         
-
-          {/* ---------- Add Brand Form ---------- */}
-
-          <div className={`transition-all ${
-              showBrandForm ? "h-90" : "h-0"
-            } w-full overflow-hidden  `}>
-          <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
-            <h1 className="text-xl mb-3">Add New Brand</h1>
-
-            <form
-              onSubmit={handleBrand}
-              className="py-5 w-full rounded flex items-center flex-wrap gap-6"
-            >
-              <div>
-                <h3 className="text-[#4B5563]">Brand Name</h3>
-
-              <input
-                name="name"
-                placeholder="Brand Name"
-                value={brandData.brandName}
-                onChange={(e) =>
-                  setBrandData({ ...brandData, brandName: e.target.value })
-                }
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                />
-              </div>
-
-              {/* Category dropdown */}
-              <div>
-                <h3 className="text-[#4B5563]">Category</h3>
-              <select
-                name="categoryName"
-                value={brandData.categoryName}
-                onChange={(e) => setBrandData({...brandData, categoryName: e.target.value})}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                >
-                <option value="">Select Category</option>
-                {FetchCategoryArray.categories?.map((cat) => (
-                  <option key={cat.id} value={cat.categoryName}>{cat.categoryName}</option>
-                ))}
-              </select>
-            </div>
-             <div>
-              <h3 className="text-[#4B5563]">Image</h3>
-              <div className="border-[#cfcfcfda] border rounded p-1 w-50 mb-2">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setBrandData({ ...brandData, Image: e.target.files[0] })
-                }
-                className="mb-2"
-                />
-                </div>
-              </div>
-              <div className="flex gap-3 pt-5  w-150 ">
-              <button
-                type="submit"
-                className="cursor-pointer bg-[#13786E] text-white px-4 py-2 mr-0 rounded"
-              >
-                Add New Brand
-              </button> 
-              <button
-                onClick={() => setShowBrandForm((prev) => !prev)}
-                type="submit"
-                className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
-              >
-                  Cancel
-              </button> 
-            </div>
-            </form>
-          </div>
-          </div>
-             {/* ---------- Add Brand Form ---------- */}
-
-          <div className={`transition-all ${
-              showCategoryForm ? "h-90" : "h-0"
-            } w-full overflow-hidden  `}>
-          <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
-            <h1 className="text-xl mb-3">Add New Category</h1>
-
-            <form
-              onSubmit={handleCategory}
-              className="py-5 w-full rounded flex items-center flex-wrap gap-6"
-            >
-              <div>
-                <h3 className="text-[#4B5563]">Brand Name</h3>
-
-              <input
-                name="name"
-                placeholder="Brand Name"
-                value={categoryData.categoryName}
-                onChange={(e) =>
-                  setCategoryData({ ...categoryData, categoryName: e.target.value })
-                }
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                />
-              </div>
-
-              {/* Category dropdown */}
-              <div>
-                <h3 className="text-[#4B5563]">Category</h3>
-              <select
-                name="categoryName"
-                value={brandData.categoryName}
-                onChange={(e) => setBrandData({...brandData, categoryName: e.target.value})}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                >
-                <option value="">Select Category</option>
-                {FetchCategoryArray.categories?.map((cat) => (
-                  <option key={cat.id} value={cat.categoryName}>{cat.categoryName}</option>
-                ))}
-              </select>
-            </div>
-             <div>
-              <h3 className="text-[#4B5563]">Image</h3>
-              <div className="border-[#cfcfcfda] border rounded p-1 w-50 mb-2">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setBrandData({ ...brandData, Image: e.target.files[0] })
-                }
-                className="mb-2"
-                />
-                </div>
-              </div>
-              <div className="flex gap-3 pt-5  w-150 ">
-              <button
-                type="submit"
-                className="cursor-pointer bg-[#13786E] text-white px-4 py-2 mr-0 rounded"
-              >
-                Add New Brand
-              </button> 
-              <button
-                onClick={() => setShowBrandForm((prev) => !prev)}
-                type="submit"
-                className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#20B0A4] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
-              >
-                  Cancel
-              </button> 
-            </div>
-            </form>
-          </div>
-          </div>
-          {/* ---------- Add Category Form ---------- */}
-          {/* <div
-            className={`absolute transition-all duration-300 ${
-              showCategoryForm ? "top-17" : "top-[-200%]"
-            } w-full p-5 rounded-xl bg-[#f8f6f6]`}
-          >
-            <h1 className="text-xl mb-3">Add New Category</h1>
-            <form
-              onSubmit={handleCategory}
-              className="py-5 w-full rounded flex items-center flex-wrap gap-2"
-            >
-              <input
-                name="categoryName"
-                placeholder="Category Name"
-                value={categoryData.categoryName}
-                onChange={(e) =>
-                  setCategoryData({ ...categoryData, categoryName: e.target.value })
-                }
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
-              <button
-                type="submit"
-                className="cursor-pointer bg-gray-800 text-white px-4 py-2 rounded"
-              >
-                Add Category
-              </button>
-            </form>
-          </div> */}
-        </header>
-
-        
-      <div className="w-full  overflow-hidden shadow-sm rounded-lg  ">
-         {/* ---------- Add Product Form ---------- */}
-          <div className={`transition-all ${
-              showProductForm ? "h-90" : "h-0"
-            } w-full overflow-hidden  `}>
-          <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
-            <h1 className="text-xl mb-3">Add New Product</h1>
-
-            <form
-              onSubmit={e => handleSubmitProduct(e)}
-              className="py-5 w-full rounded flex items-center flex-wrap gap-6"
-            >
-              <div>
-                <h3 className="text-[#4B5563]">Full Name</h3>
-              <input
-                name="Name"
-                value={formData.Name}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#D1D5DB] p-2 w-50 mb-2"
-              />
-              </div>
-              <div>
-                <h3 className="text-[#4B5563]">Price</h3>
-                <input
-                name="Price"
-                value={formData.Price}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
-              </div>
-              <div>
-                <h3 className="text-[#4B5563]">Discount</h3>
-              <input
-                name="Discount"
-                value={formData.Discount}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
-              </div>
-              <div>
-                <h3 className="text-[#4B5563]">Stock</h3>
-              <input
-                name="Stock"
-                value={formData.Stock}
-                onChange={e => handleProductChange(e)}
-                className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-              />
-              </div>
-              {/* Brand dropdown */}
-              <div>
-                <h3 className="text-[#4B5563]">Brand</h3>
-              <select
-                name="brandName"
-                value={formData.brandName}
-                onChange={e => handleProductChange(e)}
-                className="border p-2 w-50 outline-none rounded border-[#cfcfcfda]"
-              >
-                <option value="">Select Brand</option>
-                {/* {FetchBrandArray.brands?.map((b, idx) => (
-                  <option key={b.id ?? b.brandName ?? idx} value={b._id}>
-                  {b.brandName}
-                  </option>
-                  ))} */}
-              </select>
-              </div>
-              <div>
-                <h3 className="text-[#4B5563]">Description</h3>
-              <input
-                name="Description"
-                value={formData.Description}
-                onChange={e => handleProductChange(e)}
-                className="border outline-none border-[#cfcfcfda] p-2 w-50 "
-              />
-              </div>
-              <div>
-                <h3 className="text-[#4B5563]">Image</h3>
-              <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#cfcfcfda]">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={e => handleProductFile(e)}
-                className="mb-2"
-              />
-              </div>
-              </div>
-              <div className="flex gap-3 pt-5  w-55 ">
-              <button
-                type="submit"
-                className="cursor-pointer bg-[#13786E] text-white px-4 py-2 mr-0 rounded"
-              >
-                Add Product
-              </button> 
-              <button
-                onClick={() => setShowProductForm((prev) => !prev)}
-                type="submit"
-                className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#13786E] hover:border-[#13786E] transition-all ease-in   px-4 py-2 mr-0 rounded"
-              >
-                  Cancel
-              </button> 
-            </div>
-            </form>
-          </div>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input type="text" placeholder="Search..." value={searchItem} onChange={(e) => setSearchItem(e.target.value)} className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl outline-none w-64 shadow-sm focus:ring-2 focus:ring-[#13786E] transition-all" />
           </div>
           
-    <table className="w-[96.5%] m-5  border-gray-200 border-2 rounded-lg bg-white">
-      {/* Table Header */}
-      <thead className="bg-white border-b border-gray-300">
-        <tr>
-          <th className="px-2 py-3 font-semibold text-gray-700">Name</th>
-          <th className="px-2 py-3 font-semibold text-gray-700">Price</th>
-          <th className="px-2 py-3 font-semibold text-gray-700">Discount</th>
-          <th className="px-2 py-3 font-semibold text-gray-700">Description</th>
-          <th className="px-2 py-3 font-semibold text-gray-700">Stock</th>
-          <th className="px-2 py-3 font-semibold text-gray-700">Brand</th>
-          <th className="px-2 py-3 font-semibold text-gray-700 text-right">Actions</th>
-        </tr>
-      </thead>
-
-      {/* Table Body */}
-      { FetchProductsArray.length > 0 ?
-      (<tbody className="divide-y divide-gray-200">
-        {FetchProductsArray?.map((p, idx) => (
-          <tr key={idx} className="hover:bg-[#E8F7F6] transition-colors">
-            <td className="px-2 py-4 text-sm text-gray-800 font-medium">{p.Name}</td>
-            <td className="px-2 py-4 text-sm text-gray-600">{p.Price}</td>
-            <td className="px-2 py-4 text-sm text-gray-600">{p.Discount}%</td>
-            <td className="px-2 py-4 text-sm text-gray-600">{p.Description?.split(' ').slice(0, 4).join(' ') + "..."}</td>
-            <td className="px-2 py-4 text-sm text-gray-600">{p.Stock}</td>
-            <td className="px-2 py-4 text-sm text-gray-600">{p.brandName}</td>
-            
-            <td className="px-4 py-4 text-right">
-              <div className="flex justify-end gap-3">
-                <button className="p-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-all">
-                  <Edit className="w-4 h-4 text-gray-700" />
-                </button>
-                <button onClick={() => handleDelete(p.id)} className="p-2 bg-red-50 hover:bg-red-100 rounded-md transition-all">
-                  <Trash2 className="w-4 h-4 text-red-600" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>)
-      :(<tbody>
-        <tr>
-          <td colSpan={7} className="text-center py-20">Products Not Found</td>
-        </tr>
-      </tbody>)}
-
-          </table>
-
+          <button onClick={() => setActiveForm('brand')} className={`p-2.5 rounded-xl border transition-all ${activeForm === 'brand' ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`} title="Add Brand"><Bookmark size={20}/></button>
+          <button onClick={() => setActiveForm('category')} className={`p-2.5 rounded-xl border transition-all ${activeForm === 'category' ? 'bg-teal-600 text-white border-teal-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`} title="Add Category"><Tag size={20}/></button>
+          <button onClick={() => setActiveForm('product')} className="flex items-center gap-2 px-6 py-2.5 bg-[#13786E] text-white rounded-xl font-bold hover:bg-[#0e5e56] shadow-lg shadow-teal-900/10 transition-all">
+            <Plus size={20} /> Add Product
+          </button>
         </div>
-        
       </div>
-      
-    );
-  };
 
-  export default ProductPage;
+      {/* Forms Section */}
+      {activeForm && (
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 mb-8 animate-in fade-in slide-in-from-top-4 duration-300 relative">
+          <button onClick={() => setActiveForm(null)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors"><X size={24}/></button>
+          
+          {/* 1. BRAND FORM */}
+          {activeForm === 'brand' && (
+            <form onSubmit={handleBrandSubmit} className="space-y-6">
+              <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2"><Bookmark className="text-[#13786E]"/> Add New Brand</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <InputField label="Brand Name" placeholder="e.g. Samsung" value={brandForm.brandName} onChange={(e)=>setBrandForm({...brandForm, brandName: e.target.value})} />
+                
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-600">Assign Category</label>
+                  <select className="border border-gray-200 p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-[#13786E] text-sm" value={brandForm.categoryName} onChange={(e)=>setBrandForm({...brandForm, categoryName: e.target.value})}>
+                    <option value="">Select Category</option>
+                    {categoriesList.map((cat, i) => <option key={i} value={cat.categoryName}>{cat.categoryName}</option>)}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                   <label className="text-sm font-medium text-gray-600">Brand Logo</label>
+                   <label className="flex items-center justify-center gap-2 border border-dashed border-teal-200 bg-teal-50/30 p-2.5 rounded-lg cursor-pointer hover:bg-teal-50 transition-all">
+                      <Upload size={16} className="text-teal-600" />
+                      <span className="text-xs text-teal-700 font-semibold truncate">{brandForm.Image ? brandForm.Image.name : "Upload Logo"}</span>
+                      <input type="file" className="hidden" onChange={(e)=>setBrandForm({...brandForm, Image: e.target.files[0]})} />
+                   </label>
+                </div>
+              </div>
+              <div className="flex justify-end"><button type="submit" className="px-8 py-2 bg-[#13786E] text-white rounded-xl font-bold shadow-md">Save Brand</button></div>
+            </form>
+          )}
+
+          {/* 2. CATEGORY FORM */}
+          {activeForm === 'category' && (
+            <form onSubmit={handleCategorySubmit} className="max-w-md space-y-4">
+              <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2"><Tag className="text-[#13786E]"/> Add New Category</h2>
+              <div className="flex gap-2">
+                <input className="flex-1 border border-gray-200 p-2.5 rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-[#13786E]" placeholder="Category Name..." value={catForm.categoryName} onChange={(e)=>setCatForm({categoryName: e.target.value})} />
+                <button type="submit" className="bg-[#13786E] text-white px-6 rounded-xl font-bold shadow-md">Add</button>
+              </div>
+            </form>
+          )}
+
+          {/* 3. PRODUCT FORM */}
+          {activeForm === 'product' && (
+            <form onSubmit={handleProductSubmit} className="space-y-6">
+              <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2"><Package className="text-[#13786E]"/> New Product Details</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <InputField label="Product Name" value={productForm.Name} onChange={(e)=>setProductForm({...productForm, Name: e.target.value})} />
+                <InputField label="Price" type="number" value={productForm.Price} onChange={(e)=>setProductForm({...productForm, Price: e.target.value})} />
+                <InputField label="Stock" type="number" value={productForm.Stock} onChange={(e)=>setProductForm({...productForm, Stock: e.target.value})} />
+                <InputField label="Discount (%)" type="number" value={productForm.Discount} onChange={(e)=>setProductForm({...productForm, Discount: e.target.value})} />
+                
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-600">Select Brand</label>
+                  <select className="border border-gray-200 p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-[#13786E] text-sm cursor-pointer" value={productForm.brandName} onChange={(e)=>setProductForm({...productForm, brandName: e.target.value})}>
+                    <option value="">{results[2].isLoading ? "Loading brands..." : "Choose a brand"}</option>
+                    {brandsList.map((b, i) => (
+                      <option key={b._id || b.id || i} value={b.brandName}>
+                        {b.brandName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-600">Product Image</label>
+                  <label className="cursor-pointer border border-dashed border-teal-200 bg-teal-50/30 rounded-lg p-2 text-center hover:bg-teal-50 transition-all flex items-center justify-center gap-2">
+                    <Upload size={16} className="text-teal-600" />
+                    <span className="text-xs text-teal-700 font-medium truncate max-w-[120px]">{productForm.Image ? productForm.Image.name : "Upload Image"}</span>
+                    <input type="file" className="hidden" onChange={(e)=>setProductForm({...productForm, Image: e.target.files[0]})} />
+                  </label>
+                </div>
+              </div>
+              <textarea className="w-full border border-gray-200 p-2.5 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-[#13786E] h-20 text-sm" placeholder="Write description..." value={productForm.Description} onChange={(e)=>setProductForm({...productForm, Description: e.target.value})}></textarea>
+              <div className="flex justify-end"><button type="submit" disabled={createProduct.isPending} className="px-8 py-2.5 bg-[#13786E] text-white rounded-xl font-bold shadow-lg transition-all">{createProduct.isPending ? "Saving..." : "Save Product"}</button></div>
+            </form>
+          )}
+        </div>
+      )}
+
+      {/* Table Section */}
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-100 text-xs font-bold uppercase text-gray-500">
+              <th className="px-6 py-4">Product</th>
+              <th className="px-6 py-4">Brand</th>
+              <th className="px-6 py-4">Price</th>
+              <th className="px-6 py-4">Stock</th>
+              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {isLoading ? (
+               <tr><td colSpan={6} className="py-20 text-center text-gray-400">Loading Inventory...</td></tr>
+            ) : filteredProducts.length > 0 ? (
+              filteredProducts.map((p, idx) => (
+                <tr key={idx} className="hover:bg-teal-50/30 transition-colors group">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
+                        {p.Image ? <img src={p.Image} alt="" className="w-full h-full object-cover"/> : <ImageIcon className="text-gray-300" size={18}/>}
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-800 text-sm">{p.Name}</p>
+                        <p className="text-[10px] text-gray-400 truncate w-32">{p.Description}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-600">{p.brandName || "N/A"}</td>
+                  <td className="px-6 py-4">
+                    <p className="font-bold text-gray-800 text-sm">${p.Price}</p>
+                    {p.Discount > 0 && <p className="text-[10px] text-emerald-500 font-bold">-{p.Discount}%</p>}
+                  </td>
+                  <td className="px-6 py-4 text-sm font-semibold text-gray-700">{p.Stock}</td>
+                  <td className="px-6 py-4">
+                    <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full w-fit ${p.Stock > 10 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                      {p.Stock > 10 ? <CheckCircle2 size={12}/> : <AlertCircle size={12}/>}
+                      {p.Stock > 10 ? 'In Stock' : 'Low Stock'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="p-1.5 hover:bg-white rounded border border-transparent hover:border-gray-200 text-gray-500"><Edit size={14}/></button>
+                      <button onClick={()=>handleDelete(p._id || p.id)} className="p-1.5 hover:bg-red-50 rounded border border-transparent hover:border-red-100 text-red-500"><Trash2 size={14}/></button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr><td colSpan={6} className="py-20 text-center text-gray-400 italic">No inventory found.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const InputField = ({ label, ...props }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-sm font-medium text-gray-600">{label}</label>
+    <input {...props} className="border border-gray-200 p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-[#13786E] bg-gray-50 text-sm transition-all" />
+  </div>
+);
+
+export default ProductPage;

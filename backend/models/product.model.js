@@ -1,20 +1,15 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/sql.connnect.js";
+import mongoose from "mongoose";
 
-export const Product = sequelize.define("Product", {
-  brandId : {
-      type : DataTypes.INTEGER, 
-    },
-  brandName : DataTypes.STRING,
-  Name: DataTypes.STRING,
-  Price: DataTypes.STRING,
-  Image: DataTypes.TEXT,
-  Stock: DataTypes.STRING,
-  Description: DataTypes.TEXT,
-  Discount: DataTypes.STRING,
-},{
-  timestamps: true,
-  updatedAt : false,
-  tableName: 'Products'
-}
-);
+const productSchema = new mongoose.Schema({
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: "Brand" },
+  brandName: { type: String, trim: true },
+  Name: { type: String, required: true, trim: true },
+  Price: { type: String, required: true },
+  Image: { type: String, default: "" },
+  Stock: { type: String, default: "0" },
+  Description: { type: String, default: "" },
+  Discount: { type: String, default: "0" },
+}, { timestamps: { createdAt: true, updatedAt: false } });
+
+export const Product = mongoose.models.Product || mongoose.model("Product", productSchema);
+export default Product;

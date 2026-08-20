@@ -3,8 +3,6 @@ import bcrypt from "bcryptjs";
 import {User} from "../models/user.model.js";
 import { newUser } from "../services/user.service.js";
 import { validationResult } from "express-validator";
-import { createNotification } from "./notification.controller.js";
-
 
 
 export const registerUser = async (req, res) => {
@@ -40,7 +38,6 @@ export const registerUser = async (req, res) => {
       message : `${user.username || user.email} , your account has been successfully created with role ${user.role} , you can now explore our retail management system and enjoy seamless shopping experience!`,
       NotificationType : "login_alert"
     }
-    createNotification(template)
   } catch (err) {
     console.error(err);
     console.log("User registered error:", err.message)

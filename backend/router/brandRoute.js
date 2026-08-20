@@ -22,7 +22,7 @@ router.post("/create", upload.single("Image"), async (req, res) => {
     }
 
     // Check duplicate
-    const existingBrand = await  Brand.findOne({where : {brandName : brandName}});
+    const existingBrand = await Brand.findOne({ brandName: brandName.trim() });
     if (existingBrand) {
       return res.status(400).json({ success: false, message: "Brand already exists" });
     }
@@ -38,9 +38,7 @@ router.post("/create", upload.single("Image"), async (req, res) => {
       }
     }
     // Valid Category check
-    const fetchCategory = await Category.findOne({
-      where : {categoryName : categoryName}
-    });
+    const fetchCategory = await Category.findOne({ categoryName: categoryName.trim() });
     if (!fetchCategory) {
       return res.status(404).json({ success: false, message: `Category ID ${categoryName} not found.` });
     }
@@ -48,7 +46,7 @@ router.post("/create", upload.single("Image"), async (req, res) => {
     const brand = await Brand.create({
       brandName: brandName.trim(),
       Image: url, // Capital 'I' jaisa model mein hai
-      categoryId: fetchCategory.id,
+      categoryId: fetchCategory._id,
       categoryName : fetchCategory.categoryName
 
     });
@@ -70,14 +68,14 @@ router.post("/create", upload.single("Image"), async (req, res) => {
 // 🔹 GET ALL BRANDS
 router.get("/", async (req, res) => {
   try {
-    const brands = await Brand.findAll()
-     
+    const brands = await Brand.find().sort({ createdAt: -1 });
     if(!brands.length) return res.status(404).send("total brands fetched success" + [])
     res.status(200).json({
       success: true,
       count: brands.length,
       brands,
     });
+
   } catch (error) {
     console.log("Error fetching brands:", error);
     res.status(500).json({ success: false, message: "Failed to fetch brands" , error : error.message });

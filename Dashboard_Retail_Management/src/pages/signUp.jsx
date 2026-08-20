@@ -4,7 +4,6 @@ import { Home } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../lib/axios";
 import { toast } from "react-toastify";
-import { requestNotificationPermissionAndgetToken } from "../config/notificationService";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -20,11 +19,6 @@ const SignUp = () => {
     mutationFn : async(payload)=>{
       console.log("User SignUp" , payload)
       const res = await axiosInstance.post("/auth/signup", payload)
-      if(res.data.success){
-        let userId = res.data.user.id
-        console.log(userId)
-        requestNotificationPermissionAndgetToken(userId)
-      }
       console.log("hiting api",res)
     },onSuccess: ()=>{
         queryClient.invalidateQueries(["authUser"])      

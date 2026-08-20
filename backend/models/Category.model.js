@@ -1,15 +1,8 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/sql.connnect.js";
+import mongoose from "mongoose";
 
-export const Category = sequelize.define("Category" , {
-     categoryName :{ 
-        type : DataTypes.STRING,
-        allowNull : false,
-        unique : true
-    },
-},
-{
-    timeStamp : true,
-    updatedAt :  false,
-    tableName : "Categories"
-})
+const categorySchema = new mongoose.Schema({
+    categoryName: { type: String, required: true, unique: true, trim: true },
+}, { timestamps: { createdAt: true, updatedAt: false } });
+
+export const Category = mongoose.models.Category || mongoose.model("Category", categorySchema);
+export default Category;

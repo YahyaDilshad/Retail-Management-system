@@ -1,56 +1,21 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/sql.connnect.js";
+import mongoose from "mongoose";
 
-export const Staff =  sequelize.define("Staff" , {
-    userId :{
-        type : DataTypes.INTEGER,
-    },
-    Name : {
-        type : DataTypes.STRING
-    },
-    FatherName : {
-        type : DataTypes.STRING
+const staffSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  Name: String,
+  FatherName: String,
+  email: String,
+  Designation: String,
+  CNICnumber: { type: String, required: true },
+  MobileNumber: String,
+  Address: String,
+  Gender: { type: String, enum: ["Male", "Female"], default: "Male" },
+  bankHolderName: String,
+  AccountNumber: String,
+  BranchName: String,
+  IdCardFrontImage: String,
+  IdCardBackImage: String,
+}, { timestamps: { createdAt: true, updatedAt: false } });
 
-    },
-    email :{
-    type : DataTypes.STRING
-    },
-    Designation : {
-        type : DataTypes.STRING
-    },
-    CNICnumber :{
-        type : DataTypes.STRING
-    },
-    MobileNumber : {
-        type : DataTypes.STRING
-    },
-    Address : {
-        type : DataTypes.STRING
-    },
-    Gender :{
-        type: DataTypes.ENUM("Male" ,"Female"),
-        allowNull : false,
-        defaultValue : "Male"
-    },
-    bankHolderName :{
-        type : DataTypes.STRING
-    },
-    AccountNumber :{    
-        type : DataTypes.STRING
-    },
-    BranchName :{
-        type: DataTypes.STRING
-    },
-    IdCardFrontImage: {
-      type: DataTypes.STRING
-    },
-    IdCardBackImage: {
-      type: DataTypes.STRING
-    },  
-    
-
-  },{
-  timestamps: true,
-  updatedAt : false,
-  tableName: 'Staffs'
-})
+export const Staff = mongoose.models.Staff || mongoose.model("Staff", staffSchema);
+export default Staff;

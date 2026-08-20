@@ -3,11 +3,11 @@ import websocket from "ws"
 
 export const sendpendingNotification = async (userId , ws)=>{
 try {
-  const pending = await  Notification.findAll({
+  const pending = await Notification.find({
     userId,
     status : "PENDING",
     deliveryStatuswebsocketsent : false,
-    expiresAt :{$gt : new Date.now()},
+    expiresAt: { $gt: new Date() },
     
   }).sort({createdAt : -1 }).limit(10)
 
@@ -16,10 +16,10 @@ try {
         ws.send(JSON.stringify({ type : 'NOTIFICATION' , data : notification}))
     }
   }
-  Notification.status = "SENT";
-  Notification.sentAt = new Date.now();
-  Notification.deliveryStatuswebsocketsent = true;
-  Notification.afterSave()      
+  await Notification.updateMany(
+    { _id: { $in: pending.map((notification) => notification._id) } },
+    { $set: { status: "SENT", sentAt: new Date(), deliveryStatuswebsocketsent: true } },
+  );
 } catch (error) {
   console.log("error in sendpendingNotification()", error)       
 }} 

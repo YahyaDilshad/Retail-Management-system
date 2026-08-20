@@ -2,17 +2,18 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 
 export const newUser = async({
-    identifier,
+    username,
+    email,
     password,
     role
 })=>{
     const  user  = await User.create({
-        username: identifier || "",
-        email: identifier || "",
+        username: username || "",
+        email: email || "",
         password,
         role
 
         })
-        const token = jwt.sign({ id : user.id , role: user.role }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: user._id.toString(), role: user.role }, process.env.JWT_SECRET);
         return {user , token};
     };

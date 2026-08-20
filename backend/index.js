@@ -4,32 +4,32 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { connectMongo } from "./config/mongo.connect.js";
 
 import categoryRoutes from "./router/categoryRoute.js";
 import brandRoutes from "./router/brandRoute.js";
 import productRoutes from "./router/productRoute.js";
 import authuser from "./router/userRouter.js";
 import staff from "./router/Staff.router.js";
-import notifiactionRoute from "./router/NotificationRoute.js"
 const app = express();
 
 app.use(cookieParser());
 
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || origin.includes("vercel.app")) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
-}));
-
 // app.use(cors({
-//   origin: "http://localhost:5173",
-//   credentials : true
-// }))
+//   origin: function(origin, callback) {
+//     if (!origin || origin.includes("vercel.app")) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   credentials: true
+// }));
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials : true
+}))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,7 +43,6 @@ app.use("/api/products", productRoutes);
 app.use("/api/staff", staff);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/brands", brandRoutes);
-app.use("/api/notification", notifiactionRoute)
 // global error handler
 app.use((err, req, res, next) => {
   console.error(err);
@@ -52,8 +51,17 @@ app.use((err, req, res, next) => {
 
 // >>> RAILWAY KE LIYE YEH PORT SETTING LAZMI HAI <<<
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+
+const startServer = async () => {
+  await connectMongo();
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+};
+
+startServer().catch((error) => {
+  console.error("Failed to start server:", error.message);
+  process.exit(1);
 });
 
 export default app;

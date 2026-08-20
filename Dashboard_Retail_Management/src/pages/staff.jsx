@@ -1,398 +1,324 @@
-  import React, { useEffect, useState } from "react";
-  import useProductStore from "../store/productauthstore";
-  import { toast } from "react-toastify";
-  import { Plus, BadgeCheck, FolderTree, Delete, Trash2, Edit, Loader } from "lucide-react";
-  import {QueryCache, useMutation, useQueries, useQuery, useQueryClient} from "@tanstack/react-query"
-  import Swal from 'sweetalert2';
-  import axiosInstance from "../lib/axios";
-  import { LoaderIcon } from "react-hot-toast";
-  const Staff = () => {
-    
-    const [showstaffForm, setShowstaffForm] = useState(false);
-    const [searchItem, setSearchItem] = useState("");
-    
-    const queryClient  = useQueryClient()
-    const CreateStaffArray = useMutation(
+import React, { useState } from "react";
+import { 
+  Plus, Trash2, Edit, Loader, Search, 
+  UserPlus, X, CreditCard, Briefcase, 
+  MapPin, Phone, Mail, UserCheck, FileText 
+} from "lucide-react";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import Swal from 'sweetalert2';
+import axiosInstance from "../lib/axios";
+import { toast } from "react-toastify";
+
+const Staff = () => {
+  const [showStaffForm, setShowStaffForm] = useState(false);
+  const [searchItem, setSearchItem] = useState("");
+  const queryClient = useQueryClient();
+
+  // Fetch Staff Data
+  const results = useQueries({
+    queries: [
       {
-          mutationFn : async (data) =>{ 
-            console.log("create Data" , data)
-          const res = await axiosInstance.post('/staff/create' , data)
-          },
-          onSuccess : ()=>{
-            queryClient.invalidateQueries(['staffs'])
-          }
+        queryKey: ['staffs'],
+        queryFn: async () => {
+          const res = await axiosInstance.get('/staff');
+          return res.data;
+        }
       }
-  )
-    const results = useQueries({
-        queries :[
-          {
-            queryKey : ['staffs'],
-            queryFn : async()=>{
-              const res = await axiosInstance.get('/staff')
-              return res.data
+    ]
+  });
 
-            }
-          },
-          
-          
-        ]
-    
-      })
-    
+  const staffList = results[0]?.data?.data || [];
+  const isLoading = results[0].isLoading;
 
-    const FetchStaffsArray = results[0]?.data?.data || []
-   // nst FetchSearchProducts = results[3].data || []
-  
+  // Mutation for Creating Staff
+  const createStaffMutation = useMutation({
+    mutationFn: async (data) => {
+      return await axiosInstance.post('/staff/create', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['staffs']);
+      toast.success("✅ Staff Member Added Successfully!");
+      resetForm();
+      setShowStaffForm(false);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to add staff");
+    }
+  });
 
-  // --------------Delete Staff ------------------
+  // Form State
+  const [formData, setFormData] = useState({
+    Name: "", FatherName: "", Designation: "", CNICnumber: "",
+    MobileNumber: "", Address: "", Gender: "", bankHolderName: "",
+    AccountNumber: "", BranchName: "", email: "",
+    IDFrontImage: null, IDBackImage: null
+  });
+
+  const resetForm = () => {
+    setFormData({
+      Name: "", FatherName: "", Designation: "", CNICnumber: "",
+      MobileNumber: "", Address: "", Gender: "", bankHolderName: "",
+      AccountNumber: "", BranchName: "", email: "",
+      IDFrontImage: null, IDBackImage: null
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setFormData(prev => ({ ...prev, [name]: files[0] }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.IDFrontImage || !formData.IDBackImage) {
+      return toast.error("Please upload both sides of the ID card");
+    }
+
+    const data = new FormData();
+    Object.keys(formData).forEach(key => {
+      data.append(key, formData[key]);
+    });
+
+    createStaffMutation.mutate(data);
+  };
 
   const handleDelete = async (id) => {
     Swal.fire({
-      title: "Are you Sure you want to delete this Staff?",
-      text: "Cannot get Staff after delete!",
+      title: "Are you sure?",
+      text: "You won't be able to revert this staff record!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#0e6d65",
-      cancelButtonColor: "#9CA3AF",
-      confirmButtonText: "Produst Delete",
-      cancelButtonText: "cancel"
+      confirmButtonColor: "#13786E",
+      cancelButtonColor: "#EF4444",
+      confirmButtonText: "Yes, delete it!"
     }).then(async (result) => {
-    if (result.isConfirmed) {
+      if (result.isConfirmed) {
         try {
-          const res = await axiosInstance.delete(`/staff/${id}`)
-        
-          if (res) {
-            queryClient.invalidateQueries(['staffs'])
-            // Success Custom Alert
-            Swal.fire({
-              title: "Deleted!",
-              text: "Staff deleted SuccessFull",
-              icon: "success",
-              timer: 1500, // 1.5 seconds baad khud band ho jayega
-              showConfirmButton: false
-            });
-          }
+          await axiosInstance.delete(`/staff/${id}`);
+          queryClient.invalidateQueries(['staffs']);
+          Swal.fire("Deleted!", "Staff has been deleted.", "success");
         } catch (error) {
-          Swal.fire("Error!", "Something Went Wrong For deleting Staff.", "error");
+          Swal.fire("Error!", "Failed to delete staff.", "error");
         }
       }
     });
   };
 
-    
-    // ---------- Create Staff ----------
-    const [formData, setFormData] = useState({
-      Name : "",
-      FatherName: "",
-      Designation: "",
-      CNICnumber: "",
-      MobileNumber: "",
-      Address: "",
-      Gender: "",
-      bankHolderName: "",
-      AccountNumber: "",
-      BranchName: "",
-      email: "",
-      IDFrontImage : null,
-      IDBackImage: null
-    });
+  // Filter Search
+  const filteredStaff = staffList.filter(staff => 
+    staff.Name?.toLowerCase().includes(searchItem.toLowerCase()) ||
+    staff.Designation?.toLowerCase().includes(searchItem.toLowerCase()) ||
+    staff.CNICnumber?.includes(searchItem)
+  );
 
-    const handlestaffFile = (e) => {
-    const { name , files} = e.target;
-    setFormData((prev) => ({ ...prev , [name] : files[0]}))
-    };
-    const handleStaffChange = (e) => {
-      const { name, value } = e.target; // Small letters use karein
-      setFormData({ ...formData, [name]: value });
-    };
-
-  const handleSubmitstaff = async (e) => {
-    e.preventDefault();
-    
-    const data = new FormData();
-    
-    // Text fields append karein
-    data.append('Name', formData.Name);
-    data.append('FatherName', formData.FatherName);
-    data.append('Designation', formData.Designation);
-    data.append('CNICnumber', formData.CNICnumber);
-    data.append('Address' , formData.Address)
-    data.append('BranchName', formData.BranchName);
-    data.append('email', formData.email);
-    data.append('AccountNumber', formData.AccountNumber);
-    data.append('Gender', formData.Gender);
-    data.append('bankHolderName', formData.bankHolderName);
-    data.append('MobileNumber', formData.MobileNumber);
-
-    if (formData.IDFrontImage) {
-      data.append('IDFrontImage', formData.IDFrontImage); 
-    } else {
-      return toast.error("Please select an image"); // Image lazmi check karein
-    }
-    if(formData.IDBackImage){
-        data.append('IDBackImage' , formData.IDBackImage)
-    }else{
-        return toast.error("PLease Select an Image for Back Side Of your ID card")
-    }
-
-    try {
-      // Sahi mutation function call karein
-      await CreateStaffArray.mutateAsync(data); 
-      toast.success("✅ Staff added successfully!");
+  return (
+    <div className="flex-1 ml-64 min-h-[90%] mt-14 bg-[#F8FAFC] p-8">
       
-      // Form Reset
-      setFormData({
-        Name: "", FatherName: "", Designation: "",email : "" , Gender : "" ,BranchName : "" , AccountNumber : "", Address : "" , CNICnumber: "", MobileNumber: "", Address: "", IDBackImage: null,IDFrontImage: null
-      });
-      setShowstaffForm(false);
-    } catch (error) {
-      console.error("Backend Error:", error.response?.data || error.message);
-      toast.error("❌ Failed to add Staff");
-    }
-  };
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Staff Management</h1>
+          <p className="text-gray-500">Manage your team members and their information</p>
+        </div>
 
-    // ---------- JSX ----------
-    return (
-     <div className="flex-1 ml-60 min-h-screen bg-[#F8FAFC] transition-all duration-300">
-           <header className="w-full relative">
-               <div className="px-6 py-5 relative flex items-center justify-between">
-                 <h1 className="font-bold text-3xl">Staff Management</h1>
-               <div className=" w-[70%] flex items-center gap-2 justify-end">
-                   {/* ---------- Search Bar ---------- */}
-             <header className="px-6 py-5 w-fit flex items-center justify-between">
-               <input
-                 type="text"
-                 value={searchItem}
-                 placeholder="Search Staff..."
-                 onChange={(e) => setSearchItem(e.target.value)}
-                 className="border border-[#cfcfcf] p-2 rounded w-full focus:outline-none focus:ring-1 focus:ring-[#13786E]"
-               />
-             </header>
-                   {/* Add Staff Button */}
-                   <div
-                     onClick={() => setShowstaffForm((prev) => !prev)}
-                     className="btn bg-[#13786E] py-2 px-5 flex items-center text-white rounded cursor-pointer gap-2"
-                   >
-                     <Plus />
-                     <button>Add Staff</button>
-                   </div>
-                 </div>
-               </div>
-             </header>
-     
-             
-           <div className="w-full  overflow-hidden shadow-sm rounded-lg  ">
-              {/* ---------- Add Product Form ---------- */}
-               <div className={`transition-all ${
-                   showstaffForm ? "h-[65vh]" : "h-0"
-                 } w-full overflow-hidden  `}>
-               <div className="m-5 p-10 border-gray-200 border rounded-lg bg-white ">
-                 <h1 className="text-xl mb-3">Add New Staff</h1>
-     
-                 <form
-                   onSubmit={e => handleSubmitstaff(e)}
-                   className="py-5 w-full rounded flex items-center flex-wrap gap-6"
-                 >
-                   <div>
-                     <h3 className="text-[#4B5563]">Name</h3>
-                   <input
-                     name="Name"
-                     value={formData.Name}
-                     onChange={e => handleStaffChange(e)}
-                     className="border rounded outline-none border-[#D1D5DB] p-2 w-50 mb-2"
-                   />
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">Father Name</h3>
-                     <input
-                     name="FatherName"
-                     value={formData.FatherName}
-                     onChange={e => handleStaffChange(e)}
-                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                   />
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">Email</h3>
-                   <input
-                     name="email"
-                     value={formData.email}
-                     onChange={e => handleStaffChange(e)}
-                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                   />
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">Designation</h3>
-                   <input
-                     name="Designation"
-                     value={formData.Designation}
-                     onChange={e => handleStaffChange(e)}
-                     className="border rounded outline-none border-[#cfcfcfda] p-2 w-50 mb-2"
-                   />
-                   </div>
-                   {/* gender dropdown */}
-                   <div>
-                     <h3 className="text-[#4B5563]">Gender</h3>
-                   <select
-                     name="Gender"
-                     value={formData.Gender}
-                     onChange={e => handleStaffChange(e)}
-                     className="border p-2 w-50 outline-none rounded border-[#cfcfcfda]"
-                   >
-                     <option value="">Select Gender</option>
-                     <option value="Male">Male</option>
-                     <option value="Female">Female</option>
-                   </select>
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">CNIC Number</h3>
-                   <input
-                     name="CNICnumber"
-                     value={formData.CNICnumber}
-                     onChange={e => handleStaffChange(e)}
-                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
-                   />
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">Mobile Number</h3>
-                   <input
-                     name="MobileNumber"
-                     value={formData.MobileNumber}
-                     onChange={e => handleStaffChange(e)}
-                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
-                   />
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">Address</h3>
-                   <input
-                     name="Address"
-                     value={formData.Address}
-                     onChange={e => handleStaffChange(e)}
-                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
-                   />
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">Account Number</h3>
-                   <input
-                     name="AccountNumber"
-                     value={formData.AccountNumber}
-                     onChange={e => handleStaffChange(e)}
-                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
-                   />
-                   </div>
-                  <div>
-                     <h3 className="text-[#4B5563]">Bankholder Name</h3>
-                   <input
-                     name="bankHolderName"
-                     value={formData.bankHolderName}
-                     onChange={e => handleStaffChange(e)}
-                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
-                   />
-                   </div>
-                  <div>
-                     <h3 className="text-[#4B5563]">Branch Name</h3>
-                   <input
-                     name="BranchName"
-                     value={formData.BranchName}
-                     onChange={e => handleStaffChange(e)}
-                     className="border outline-none border-[#cfcfcfda] p-2 w-50 "
-                   />
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">Idcard Front </h3>
-                   <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#cfcfcfda]">
-                   <input
-                     type="file"
-                     accept="image/*"
-                     onChange={e => handlestaffFile(e)}
-                     className="mb-2"
-                   />
-                   </div>
-                   </div>
-                   <div>
-                     <h3 className="text-[#4B5563]">Idcard Back </h3>
-                   <div className="border p-1 overflow-hidden w-50 outline-none rounded border-[#cfcfcfda]">
-                   <input
-                     type="file"
-                     accept="image/*"
-                     onChange={e => handlestaffFile(e)}
-                     className="mb-2"
-                   />
-                   </div>
-                   </div>
-                   <div className="flex gap-3 pt-5  w-60 ">
-                   <button
-                    disabled={CreateStaffArray.isLoading}
-                     type="submit"
-                     className="cursor-pointer bg-[#13786E] text-white px-4 py-2 mr-0 rounded"
-                   >
-                     {CreateStaffArray.isLoading ? <Loader className="animate-spin"/> : "Add Staff"}
-                   </button> 
-                   <button
-                     onClick={() => setShowstaffForm((prev) => !prev)}
-                     type="submit"
-                     className="cursor-pointer bg-white text-[#4B5563] border-[#cfcfcfda] border hover:text-[#13786E] hover:border-[#20B0A4] transition-all ease-in   px-4 py-2 mr-0 rounded"
-                   >
-                       Cancel
-                   </button> 
-                 </div>
-                 </form>
-               </div>
-               </div>
-               
-         <table className="w-[96.5%] m-5 border-gray-200 border-2 rounded-lg bg-white">
-           {/* Table Header */}
-           <thead className="bg-white border-b border-gray-300">
-             <tr>
-               <th className="px-2 py-3 font-semibold text-gray-700">Name</th>
-               <th className="px-2 py-3 font-semibold text-gray-700">Father Name</th>
-               <th className="px-2 py-3 font-semibold text-gray-700">Designation</th>
-               <th className="px-2 py-3 font-semibold text-gray-700">CNIC</th>
-               <th className="px-2 py-3 font-semibold text-gray-700">Email</th>
-               <th className="px-2 py-3 font-semibold text-gray-700">Account Number</th>
-               <th className="px-2 py-3 font-semibold text-gray-700">Gender</th>
-               <th className="px-2 py-3 font-semibold text-gray-700 text-right">Actions</th>
-             </tr>
-           </thead>
-     
-           {/* Table Body */}
-           {FetchStaffsArray.length > 0 ?
-           (<tbody className="divide-y divide-gray-200">
-             {FetchStaffsArray?.map((p, idx) => (
-               <tr key={idx} className="hover:bg-[#E8F7F6] transition-colors">
-                 <td className="px-2 py-4 text-sm text-gray-800 font-medium">{p.Name}</td>
-                 <td className="px-2 py-4 text-sm text-gray-600">{p.FatherName}</td>
-                 <td className="px-2 py-4 text-sm text-gray-600">{p.Designation}</td>
-                 <td className="px-2 py-4 text-sm text-gray-600">{p.CNICnumber}</td>
-                 <td className="px-2 py-4 text-sm text-gray-600">{p.email}</td>
-                 <td className="px-2 py-4 text-sm text-gray-600">{p.AccountNumber}</td>
-                 <td className="px-2 py-4 text-sm text-gray-600">{p.Gender}</td>
-                 
-                 <td className="px-4 py-4 text-right">
-                   <div className="flex justify-end gap-3">
-                     <button className="p-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-all">
-                       <Edit className="w-4 h-4 text-gray-700" />
-                     </button>
-                     <button onClick={() => handleDelete(p.id)} className="p-2 bg-red-50 hover:bg-red-100 rounded-md transition-all">
-                       <Trash2 className="w-4 h-4 text-red-600" />
-                     </button>
-                   </div>
-                 </td>
-               </tr>
-             ))}
-           </tbody>)
-           :(<tbody>
-             <tr>
-               <td colSpan={7} className="text-center py-20">Products Not Found</td>
-             </tr>
-           </tbody>)}
-     
-               </table>
-     
-             </div>
-             
-           </div>
-      
-    );
-  };
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search by name, role or CNIC..."
+              value={searchItem}
+              onChange={(e) => setSearchItem(e.target.value)}
+              className="pl-10 pr-4 py-2.5 w-72 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#13786E] focus:border-transparent outline-none shadow-sm transition-all"
+            />
+          </div>
+          <button
+            onClick={() => setShowStaffForm(!showStaffForm)}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all shadow-md ${
+              showStaffForm ? "bg-gray-200 text-gray-700" : "bg-[#13786E] text-white hover:bg-[#0e5e56]"
+            }`}
+          >
+            {showStaffForm ? <X size={20} /> : <UserPlus size={20} />}
+            {showStaffForm ? "Close Form" : "Add Staff"}
+          </button>
+        </div>
+      </div>
 
-  export default Staff;
+      {/* Add Staff Form Section */}
+      {showStaffForm && (
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+          <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <UserCheck className="text-[#13786E]" /> Member Registration
+          </h2>
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Form Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+              {/* Personal Info Group */}
+              <div className="space-y-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-teal-600 border-b border-teal-50 pb-1">Personal Details</p>
+                <InputField label="Full Name" name="Name" value={formData.Name} onChange={handleInputChange} icon={<Mail size={16}/>} />
+                <InputField label="Father's Name" name="FatherName" value={formData.FatherName} onChange={handleInputChange} />
+                <InputField label="Email Address" name="email" type="email" value={formData.email} onChange={handleInputChange} />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-600">Gender</label>
+                  <select name="Gender" value={formData.Gender} onChange={handleInputChange} className="border border-gray-200 p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Professional & Contact Group */}
+              <div className="space-y-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-teal-600 border-b border-teal-50 pb-1">Professional Info</p>
+                <InputField label="Designation" name="Designation" value={formData.Designation} onChange={handleInputChange} />
+                <InputField label="CNIC Number" name="CNICnumber" value={formData.CNICnumber} onChange={handleInputChange} />
+                <InputField label="Mobile Number" name="MobileNumber" value={formData.MobileNumber} onChange={handleInputChange} />
+                <InputField label="Current Address" name="Address" value={formData.Address} onChange={handleInputChange} />
+              </div>
+
+              {/* Bank Details Group */}
+              <div className="space-y-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-teal-600 border-b border-teal-50 pb-1">Payroll / Bank Info</p>
+                <InputField label="Account Holder Name" name="bankHolderName" value={formData.bankHolderName} onChange={handleInputChange} />
+                <InputField label="Account Number" name="AccountNumber" value={formData.AccountNumber} onChange={handleInputChange} />
+                <InputField label="Branch Name" name="BranchName" value={formData.BranchName} onChange={handleInputChange} />
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <FileInput label="ID Front" name="IDFrontImage" onChange={handleFileChange} />
+                  <FileInput label="ID Back" name="IDBackImage" onChange={handleFileChange} />
+                </div>
+              </div>
+
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
+              <button 
+                type="button" 
+                onClick={resetForm}
+                className="px-6 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 font-medium"
+              >
+                Clear All
+              </button>
+              <button 
+                type="submit" 
+                disabled={createStaffMutation.isPending}
+                className="px-8 py-2 bg-[#13786E] text-white rounded-xl font-bold hover:bg-[#0e5e56] shadow-lg shadow-teal-900/10 flex items-center gap-2 disabled:opacity-50"
+              >
+                {createStaffMutation.isPending ? <Loader className="animate-spin" size={20}/> : "Register Staff Member"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Staff Table Section */}
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-100">
+                <th className="px-6 py-4 text-xs font-bold uppercase text-gray-500">Staff Info</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase text-gray-500">Role</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase text-gray-500">CNIC</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase text-gray-500">Contact</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase text-gray-500">Bank Details</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase text-gray-500 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="py-20 text-center">
+                    <Loader className="animate-spin inline-block text-[#13786E] mb-2" size={32} />
+                    <p className="text-gray-500">Loading staff data...</p>
+                  </td>
+                </tr>
+              ) : filteredStaff.length > 0 ? (
+                filteredStaff.map((staff, idx) => (
+                  <tr key={idx} className="hover:bg-teal-50/30 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="font-bold text-gray-800">{staff.Name}</p>
+                        <p className="text-xs text-gray-500">{staff.email}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="px-3 py-1 bg-teal-100 text-[#13786E] rounded-full text-xs font-bold uppercase">
+                        {staff.Designation}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-mono">{staff.CNICnumber}</td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        <p className="flex items-center gap-1 text-gray-700"><Phone size={12}/> {staff.MobileNumber}</p>
+                        <p className="text-xs text-gray-400 truncate w-32">{staff.Address}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-xs text-gray-500">
+                        <p className="font-medium text-gray-700">{staff.bankHolderName}</p>
+                        <p>{staff.AccountNumber}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 text-gray-600 shadow-sm transition-all">
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(staff._id || staff.id)}
+                          className="p-2 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100 text-red-500 shadow-sm transition-all"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-20 text-center text-gray-400 italic">
+                    No staff members found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Reusable Components for clean code
+const InputField = ({ label, ...props }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-sm font-medium text-gray-600">{label}</label>
+    <input
+      {...props}
+      className="border border-gray-200 p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50 text-sm transition-all"
+    />
+  </div>
+);
+
+const FileInput = ({ label, name, onChange }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-xs font-bold text-gray-500 uppercase">{label}</label>
+    <label className="cursor-pointer border border-dashed border-gray-300 rounded-lg p-2 hover:bg-teal-50 hover:border-teal-300 transition-all text-center">
+      <FileText size={16} className="mx-auto text-gray-400 mb-1" />
+      <span className="text-[10px] text-gray-500 block truncate">Choose Image</span>
+      <input type="file" name={name} accept="image/*" onChange={onChange} className="hidden" />
+    </label>
+  </div>
+);
+
+export default Staff;

@@ -1,88 +1,118 @@
 import { useQueries } from '@tanstack/react-query'
 import React from 'react'
 import axiosInstance from '../lib/axios'
-import { Edit3, Grid2X2, LayoutDashboard, LayoutGrid, ListOrdered, Package, TrendingUp } from 'lucide-react'
+import { 
+  Grid2X2, 
+  Package, 
+  TrendingUp, 
+  Users, 
+  ArrowRight 
+} from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const Dashboard = () => {
 
-  const result  = useQueries({
-    queries : [
+  const result = useQueries({
+    queries: [
       {
-        queryKey : ["totalProducts"],
-        queryFn : async()=>{
-          const res =await axiosInstance.get("/products")
+        queryKey: ["totalProducts"],
+        queryFn: async () => {
+          const res = await axiosInstance.get("/products")
           return res.data?.data || []
         },
-        staleTime : 1000 * 60 * 5
       },
       {
-        queryKey : ["Total Categories"],
-        queryFn : async()=>{
+        queryKey: ["Total Categories"],
+        queryFn: async () => {
           const res = await axiosInstance.get("/categories")
-          return res.data
+          return res.data?.categories || []
         },
-        staleTime : 1000 * 60 * 5
-      },{
-        queryKey : ["TotalStaff"],
-        queryFn : async()=>{
+      },
+      {
+        queryKey: ["TotalStaff"],
+        queryFn: async () => {
           const res = await axiosInstance.get('/staff')
-          return res.data || []
+          return res.data?.data || []
         }
       }
-
     ]
-  })  
+  })
 
-  const TotalProductsArray = result[0]?.data || []
-  const TotalCategories = result[1].data?.categories || []
-  const totalStaffArray = result[2].data?.data || []
-  console.log(totalStaffArray.length)
+  // Data mapping for cleaner UI
+  const stats = [
+    {
+      label: "Total Products",
+      count: result[0]?.data?.length || 0,
+      icon: <Package size={28} />,
+      to: "/admin/products",
+      color: "#13786E",
+      bgColor: "bg-[#ECF8F8]"
+    },
+    {
+      label: "Total Categories",
+      count: result[1]?.data?.length || 0,
+      icon: <Grid2X2 size={28} />,
+      to: "/admin/categories",
+      color: "#3B82F6", // Blue touch for distinction
+      bgColor: "bg-blue-50"
+    },
+    {
+      label: "Total Staff",
+      count: result[2]?.data?.length || 0,
+      icon: <Users size={28} />,
+      to: "/admin/staff",
+      color: "#8B5CF6", // Purple touch
+      bgColor: "bg-purple-50"
+    }
+  ];
+
   return (
-    <div className=' flex-1 ml-60 min-h-screen bg-[#F8FAFC]'>
-      <h1 className='text-3xl font-bold  ml-10'>Overview</h1>
-      <div className='flex flex-wrap gap-5 p-10'>
-         <div className={`w-[30%] h-[12rem] p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
-          <div className='flex items-center flex-row-reverse justify-between'>
-          <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
-          <Package className='w-12 h-12 text-[#13786E]'/>
-          </div>
-          <h3 className='text-md text-gray-400 font-semibold '>Total Products</h3>
-          </div>
-          <p className='text-3xl font-bold'>{TotalProductsArray.length}</p>
-          <div className='mt-4 flex items-center gap-1 text-[#13786E] '>
-            <TrendingUp className='text-[#13786E]'/>
-            <p>Manage Product Records</p>
-          </div>
-         </div>
-         <div className={`w-[30%] h-[12rem] p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
-          <div className='flex items-center flex-row-reverse justify-between'>
-         <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
-          <Grid2X2 className='w-12 h-12 text-[#13786E]'/>
-          </div>
-          <h3 className='text-md text-gray-400 font-semibold '>Total Categories</h3>
-         </div>
-          <p className='text-3xl font-bold'>{TotalCategories.length}</p>
-          <div className='mt-4 flex items-center gap-1 text-[#13786E] '>
-            <TrendingUp className='text-[#13786E]'/>
-            <p>Manage Category Records</p>
-          </div>
-         </div>
-         <div className={`w-[30%] h-[12rem] p-5 bg-white border-gray-200 border-1 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer rounded-lg flex flex-col gap-1`}>          
-          <div className='flex items-center flex-row-reverse justify-between'>
-         <div className='p-2 w-fit rounded-md bg-[#ECF8F8]'>
-          <Package className='w-12 h-12 text-[#13786E]'/>
-          </div>
-          <h3 className='text-md text-gray-400 font-semibold '>Total Staff</h3>
-         </div>
-          <p className='text-3xl font-bold'>{totalStaffArray.length}</p>
-          <div className='mt-4 flex items-center gap-1 text-[#13786E] '>
-            <TrendingUp className='text-[#13786E]'/>
-            <p>Manage Staff Records</p>
-          </div>
-         </div>
+    <div className='flex-1 ml-64 min-h-screen bg-[#F8FAFC] p-10'>
+      
+      {/* Header Section */}
+      <div className='mb-8'>
+        <h1 className='text-3xl font-bold text-gray-800'>Overview</h1>
+        <p className='text-gray-500'>Welcome back! Here's what's happening with your store today.</p>
+      </div>
+
+      {/* Stats Cards Grid */}
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+        {stats.map((item, idx) => (
+          <Link 
+            key={idx} 
+            to={item.to}
+            className='group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col'
+          >
+            {/* Top Row: Icon and Label */}
+            <div className='flex items-start justify-between mb-4'>
+              <div>
+                <h3 className='text-gray-400 font-semibold text-sm uppercase tracking-wider'>
+                  {item.label}
+                </h3>
+                <p className='text-4xl font-bold text-gray-800 mt-1'>
+                  {item.count}
+                </p>
+              </div>
+              <div className={`${item.bgColor} p-4 rounded-xl transition-transform group-hover:scale-110`} style={{ color: item.color }}>
+                {item.icon}
+              </div>
+            </div>
+
+            {/* Bottom Row: Trend and Action */}
+            <div className='mt-auto pt-6 border-t border-gray-50 flex items-center justify-between'>
+              <div className='flex items-center gap-2 text-[#13786E] text-sm font-medium'>
+                <TrendingUp size={16} />
+                <span>Live Records</span>
+              </div>
+              <div className='flex items-center gap-1 text-gray-400 group-hover:text-[#13786E] transition-colors text-sm font-bold'>
+                Manage <ArrowRight size={14} className='group-hover:translate-x-1 transition-transform' />
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   )
 }
 
-export default Dashboard
+export default Dashboard;

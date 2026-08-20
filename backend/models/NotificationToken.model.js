@@ -1,34 +1,16 @@
-import { sequelize } from "../config/sql.connnect.js";
-import { DataTypes } from "sequelize";
+import mongoose from "mongoose";
 
-export const Notification = sequelize.define("Notification", {
-  orderId :{
-    type : DataTypes.INTEGER,
-  },
-  
-  Title: {
-    type: DataTypes.STRING
-  },
-  Message: {
-    type: DataTypes.STRING
-  },
-  ImageUrl: {
-    type: DataTypes.STRING,
-    defaultValue : null
-  },
-  NotificationType: {
-    type: DataTypes.ENUM("login_alert"  , "logout_alert", "Promotion" , "Order_Recommendation" , "Product_Recommendation"),
-    defaultValue : "Promotion"
-  },
-  deliveryStatuswebsocketsent: {
-    type: DataTypes.BOOLEAN,
-    defaultValue : false
-  },
-  expiresAt: {
-    type: DataTypes.DATE
-  }
-}, {
-  timestamps: true,
-  updatedAt: false,
-  tableName : 'Notifications'
-});
+const notificationSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
+  title: String,
+  message: String,
+  NotificationType: String,
+  status: { type: String, default: "PENDING" },
+  deliveryStatuswebsocketsent: { type: Boolean, default: false },
+  sentAt: Date,
+  expiresAt: Date,
+}, { timestamps: true });
+
+export const Notification = mongoose.models.Notification || mongoose.model("Notification", notificationSchema);
+export default Notification;

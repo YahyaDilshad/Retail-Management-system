@@ -1,18 +1,11 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/sql.connnect.js";
+import mongoose from "mongoose";
 
+const userSchema = new mongoose.Schema({
+  username: { type: String, default: "" },
+  email: { type: String, default: "", lowercase: true, trim: true },
+  password: { type: String, required: true, select: false },
+  role: { type: String, enum: ["admin", "user"], default: "user" },
+}, { timestamps: { createdAt: true, updatedAt: false } });
 
-export const User = sequelize.define("User", {
-  username: DataTypes.STRING || "",
-  email : DataTypes.STRING || "",
-  password: DataTypes.STRING,
-  role: {
-  type: DataTypes.ENUM("admin", "user"),
-  allowNull: false,
-  defaultValue: "user"
-} 
-},{
-  timestamps: true,
-  updatedAt : false,
-  tableName: 'Users'
-});
+export const User = mongoose.models.User || mongoose.model("User", userSchema);
+export default User;

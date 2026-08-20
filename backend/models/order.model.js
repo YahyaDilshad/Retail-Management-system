@@ -1,26 +1,17 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/sql.connnect.js";
+import mongoose from "mongoose";
 
+const orderSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+  items: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  deliveryAddress: String,
+  deliverAddress: String,
+  totalAmount: { type: Number, required: true },
+  TotalItems: Number,
+  paymentMethod: String,
+  status: { type: String, default: "ORDER_CONFIRMED" },
+  statusHistory: { type: [mongoose.Schema.Types.Mixed], default: [] },
+}, { timestamps: true });
 
-export const Order = sequelize.define("Order", {
-  userId : {
-    type : DataTypes.INTEGER,
-  },
-  productId :{
-   type : DataTypes.INTEGER,
-   references : {
-      model : "Products",
-      key : 'id'
-  } 
-  },
-  deliverAddress : {
-    type : DataTypes.STRING
-  },
-  totalAmount: DataTypes.INTEGER,
-  TotalItems : DataTypes.INTEGER
-
-},{
-  timestamps: true,
-  updatedAt : false,
-  tableName: 'Orders'
-});
+export const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
+export default Order;

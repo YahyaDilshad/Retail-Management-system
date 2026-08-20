@@ -15,7 +15,7 @@ router.post("/create", async (req, res) => {
     }
 
     // Check duplicate
-    const existingCategory = await Category.findOne({where : {categoryName: categoryName.trim()} });
+    const existingCategory = await Category.findOne({ categoryName: categoryName.trim() });
     if (existingCategory) {
       return res.status(400).json({ success: false, message: "Category already exists" });
     }
@@ -42,9 +42,7 @@ router.post("/create", async (req, res) => {
 // 🔹 GET ALL CATEGORIES
 router.get("/", async (req, res) => {
   try {
-    const categories = await Category.findAll({
-      order : [["createdAt" , "DESC"]]
-    });
+    const categories = await Category.find().sort({ createdAt: -1 });
     // latest first
     return res.status(200).json({
       success: true,

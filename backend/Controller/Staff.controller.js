@@ -2,6 +2,7 @@ import { uploadToCloudinary } from "../config/Cloudinary.js";
 import { Staff } from "../models/Staff.model.js";
 import { User } from "../models/user.model.js";
 import {newStaff} from '../services/staff.services.js'
+import mongoose from "mongoose";
 
 
 export const CreateStaff = async (req, res) => {
@@ -29,14 +30,12 @@ export const CreateStaff = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const StaffExists = await Staff.findOne({ where: { CNICnumber } });
+    const StaffExists = await Staff.findOne({ CNICnumber });
     if (StaffExists) {
       return res.status(400).json({ message: "Staff already exists" });
     }
      
-    const fetchUser = await User.findOne({
-      where : {email : email},
-    })
+    const fetchUser = await User.findOne({ email });
     console.log('fetch find Email ', fetchUser)
     if(!fetchUser) return res.status(309).send("Use Correct Email for creating staff")
     let frontUrl = "";
@@ -65,7 +64,7 @@ export const CreateStaff = async (req, res) => {
       email: fetchUser.email,
       bankHolderName,
       AccountNumber,
-      userId : fetchUser.id,
+      userId : fetchUser._id,
       BranchName,
       IDFrontImage: frontUrl || '',
       IDBackImage: backUrl || '',
@@ -89,9 +88,8 @@ export const CreateStaff = async (req, res) => {
 export const deleteStaff =   async (req, res) => {
   try {
        const {id} = req.params;
-    const deleted = await Staff.destroy({
-      where : {id : id}
-    });
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ success: false, message: "Invalid ID format" });
+    const deleted = await Staff.findByIdAndDelete(id);
    
     if (!deleted) {
         console.log("Staff Not Found For Deleting this Id (error in controller file)")
@@ -109,17 +107,16 @@ export const deleteStaff =   async (req, res) => {
 export const getAllstaffs = async (req, res) => {
   try {
     const { staff, search } = req.query;
-    let filter = {};
-
-    if (staff) filter.staff = staff;
+    const filter = {};
+    if (staff) filter.Designation = staff;
     if (search) {
-      filter[Op.or] = [
-        { name: {[Op.like]: `%${search}%`}},
-        { description: {[Op.like] : `%${search}%`} },
+      filter.$or = [
+        { Name: { $regex: search, $options: "i" } },
+        { Designation: { $regex: search, $options: "i" } },
       ];
     }
 
-    const staffs = await Staff.findAll({ where: filter })
+    const staffs = await Staff.find(filter).sort({ createdAt: -1 });
 
     res.json({ success: true,  data: staffs });
   } catch (error) {
