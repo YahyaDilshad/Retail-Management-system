@@ -67,7 +67,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className='flex-1 ml-64 min-h-screen bg-[#F8FAFC] p-10'>
+    <div className='flex-1 ml-64 min-h-[90%] mt-14 bg-[#F8FAFC] p-10'>
       
       {/* Header Section */}
       <div className='mb-8'>

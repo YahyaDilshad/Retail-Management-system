@@ -67,12 +67,12 @@ const Categories = () => {
   );
 
   return (
-    <div className="flex-1 ml-64 min-h-screen bg-[#F8FAFC] p-8">
+    <div className="flex-1 ml-64 min-h-[90%] mt-14 bg-[#F8FAFC] p-8">
       
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+          <h1 className="text-3xl font-boldgt text-gray-800 flex items-center gap-2">
             <Layers className="text-[#13786E]" /> Categories
           </h1>
           <p className="text-gray-500">Manage your product classifications</p>
