@@ -58,8 +58,8 @@ const startServer = async () => {
   });
 };
 
-startServer().catch((error) => {
-  console.error("Failed to start server:", error.message);
+startServer().catch((err) => {
+  console.error("Failed to start server:", err.message);
   process.exit(1);
 });
 
