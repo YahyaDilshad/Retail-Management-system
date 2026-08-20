@@ -15,21 +15,21 @@ const app = express();
 
 app.use(cookieParser());
 
-// app.use(cors({
-//   origin: function(origin, callback) {
-//     if (!origin || origin.includes("vercel.app")) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("Not allowed by CORS"));
-//     }
-//   },
-//   credentials: true
-// }));
-
 app.use(cors({
-  origin: "http://localhost:5173",
-  credentials : true
-}))
+  origin: function(origin, callback) {
+    if (!origin || origin.includes("vercel.app")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
+// app.use(cors({
+//   origin: "http://localhost:5173",
+//   credentials : true
+// }))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
