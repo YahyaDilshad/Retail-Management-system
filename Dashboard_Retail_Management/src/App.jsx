@@ -1,27 +1,25 @@
 import React from 'react'
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import Orders from "./pages/Orders";
-import ClientReviews from "./pages/ClientReviews";
-import useAuthStore from './store/authstore.js'
-import SalesReports from './pages/Salesreport'
-import Setting from "./pages/Settings";
-import Users from './pages/Users.jsx';
-import Home from './pages/home.jsx'
+import { useQuery } from '@tanstack/react-query';
+import { ToastContainer } from 'react-toastify';
+import { Loader } from 'lucide-react'; // Loader icon
+import 'react-toastify/dist/ReactToastify.css'; 
+
+import axiosInstance from './lib/axios.js';
+import Sidebar from './components/sideBar.jsx';
+import Header from './components/Header.jsx';
+
+// Pages
+import SignUp from './pages/signUp.jsx'
 import Dashboard from './pages/Dashboard.jsx';
 import ProductPage from './pages/ProductPage.jsx';
-import SignUp from './pages/signUp.jsx'
-import Sidebar from './components/sideBar.jsx';
-
-import Header from './components/Header.jsx';
-import { LoaderIcon } from 'lucide-react';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import axiosInstance from './lib/axios.js';
+import Users from './pages/Users.jsx';
 import Staff from './pages/staff.jsx' 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; 
 import Categories from './pages/Categories.jsx';
 import StockManagement from './pages/StockManagement.jsx';
+import ClientReviews from './pages/ClientReviews.jsx';
+import Setting from './pages/Settings.jsx';
+import SalesReports from './pages/Salesreport'
 import About from './pages/About.jsx';
 import StockAttendence from './pages/Stock-Attendence.jsx';
 import Biling from './pages/Biling.jsx';
@@ -31,57 +29,65 @@ import StoreManagement from './pages/store.jsx';
 
 const App = () => {
   const location = useLocation();
-  const hideSidebar = ["/admin/signin", "/admin/signUp"].includes(location.pathname);
 
-  const { data: authData, isLoading , error } = useQuery({
+  const { data: authData, isLoading } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       try {
-         console.log("Api calling")
         const res = await axiosInstance.get("/auth/check");
-        return res.data || null; // Return data if exists
+        return res.data;
       } catch (error) {
-        console.log("reactQuery Erro" , error.message)
-        return null; // Return null on error, NOT undefined
+        return null;
       }
     },
     retry: false,
-    staleTime: 1000 * 60 * 5,
   });
-  
-  if(error) console.log("Axios Error" , error.message)
+
   const user = authData?.user || authData;
 
-  return (
-    <div className='relative flex'>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" /> 
-      {!hideSidebar && <aside className="hidden md:block"><Sidebar /></aside>}
+  // 1. Agar check ho raha hai to loading dikhao
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-gray-50">
+        <Loader className="animate-spin text-[#13786E]" size={40} />
+      </div>
+    );
+  }
 
-      <main className="flex-1">
-        {!hideSidebar && <Header />}
+  // Sidebar sirf tab dikhao jab user login ho AUR signup page par na ho
+  const showSidebarAndHeader = user && !["/admin/signUp", "/admin/signin"].includes(location.pathname);
+
+  return (
+    <div className='relative flex min-h-screen bg-gray-50'>
+      <ToastContainer position="top-right" autoClose={3000} /> 
+      
+      {showSidebarAndHeader && <Sidebar />}
+
+      <main className={`flex-1 ${showSidebarAndHeader ? "ml-0" : ""}`}>
+        {showSidebarAndHeader && <Header />}
         
         <Routes>
-           
+          {/* Auth Route */}
           <Route path='/admin/signUp' element={!user ? <SignUp /> : <Navigate to='/admin/dashboard' />} />
 
-          {/* Dashboard /  Home - Protect them */}
-          <Route path='/admin/products' element={user ? <ProductPage /> : <Navigate to='/admin/signin' />} />
-          <Route path='/admin/all-users' element={user ? <Users /> :  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/staff' element={user ? <Staff /> :  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/dashboard' element={user ? <Dashboard />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/categories' element={user ? <Categories />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/stock' element={user ? <StockManagement />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/client-review' element={user ? <ClientReviews />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/settings' element={user ? <Setting />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/sales-reports' element={user ? <SalesReports />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/about' element={user ? <About />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/staff-attendence' element={user ? <StockAttendence />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/billing' element={user ? <Biling />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/revenue' element={user ? <Revenue />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/scanner' element={user ? <Scanner />:  <Navigate to='/admin/signin' />}/>
-          <Route path='/admin/store' element={user ? <StoreManagement />:  <Navigate to='/admin/signin' />}/>
+          {/* Protected Routes - Redirect to /admin/signUp if not logged in */}
+          <Route path='/admin/dashboard' element={user ? <Dashboard /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/products' element={user ? <ProductPage /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/all-users' element={user ? <Users /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/staff' element={user ? <Staff /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/categories' element={user ? <Categories /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/stock' element={user ? <StockManagement /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/client-review' element={user ? <ClientReviews /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/settings' element={user ? <Setting /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/sales-reports' element={user ? <SalesReports /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/about' element={user ? <About /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/staff-attendence' element={user ? <StockAttendence /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/billing' element={user ? <Biling /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/revenue' element={user ? <Revenue /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/scanner' element={user ? <Scanner /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/store' element={user ? <StoreManagement /> : <Navigate to='/admin/signUp' />} />
 
-          {/* Fallback route - Sirf galat URL par chalega */}
+          {/* Fallback route */}
           <Route path='*' element={user ? <Navigate to='/admin/dashboard' /> : <Navigate to='/admin/signUp' />} />
         </Routes>
       </main>
@@ -89,5 +95,4 @@ const App = () => {
   );
 };
 
-
-export default App
+export default App;
