@@ -15,20 +15,21 @@ const app = express();
 
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: [
-      "https://retail-management-system-imno.vercel.app",
-      "http://localhost:5173",
-    ],
-    credentials: true,
-  })
-);
-
 // app.use(cors({
-//   origin: "http://localhost:5173",
-//   credentials : true
-// }))
+//   origin: function(origin, callback) {
+//     if (!origin || origin.includes("vercel.app")) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   credentials: true
+// }));
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials : true
+}))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -58,8 +59,8 @@ const startServer = async () => {
   });
 };
 
-startServer().catch((err) => {
-  console.error("Failed to start server:", err.message);
+startServer().catch((error) => {
+  console.error("Failed to start server:", error.message);
   process.exit(1);
 });
 
