@@ -26,6 +26,7 @@ import Biling from './pages/Biling.jsx';
 import Revenue from './pages/Revenue.jsx';
 import Scanner from './pages/Scanner.jsx';
 import StoreManagement from './pages/store.jsx';
+import MessageCenter from './pages/messageCenter.jsx';
 
 const App = () => {
   const location = useLocation();
@@ -86,7 +87,8 @@ const App = () => {
           <Route path='/admin/revenue' element={user ? <Revenue /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/scanner' element={user ? <Scanner /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/store' element={user ? <StoreManagement /> : <Navigate to='/admin/signUp' />} />
-
+          <Route path='/admin/messages' element={user ? <MessageCenter /> : <Navigate to='/admin/signUp' />} />
+          
           {/* Fallback route */}
           <Route path='*' element={user ? <Navigate to='/admin/dashboard' /> : <Navigate to='/admin/signUp' />} />
         </Routes>

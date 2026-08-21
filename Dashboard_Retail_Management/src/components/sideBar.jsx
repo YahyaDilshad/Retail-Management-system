@@ -30,7 +30,7 @@ const Sidebar = () => {
       localStorage.removeItem("fcmToken");
       queryClient.clear();
       toast.success("Logged out successfully");
-      navigate("/login");
+      navigate("/admin/signUp");
     },
     onError: () => {
       toast.error("Logout failed. Please try again.");
@@ -47,7 +47,7 @@ const Sidebar = () => {
     { label: "Messages", icon: <MessageSquare size={20} />, to: "/admin/messages" },
     { label: "Expense", icon: <TrendingDown size={20} />, to: "/admin/expense" },
     { label: "Revenue", icon: <TrendingUp size={20} />, to: "/admin/revenue" },
-    { label: "Platinum Customers", icon: <Crown size={20} />, to: "/admin/platinum-customers" },
+    { label: "Customer Status", icon: <Crown size={20} />, to: "/admin/platinum-customers" },
   ];
 
   return (

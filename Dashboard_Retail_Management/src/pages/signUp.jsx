@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Building2, Eye, EyeOff, Phone } from "lucide-react";
+import { Building2, Eye, EyeOff, MessageCircle } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../lib/axios";
 import { toast } from "react-toastify";
@@ -23,7 +23,7 @@ const SignUp = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["authUser"]);
       toast.success("Signup successful!");
-      navigate("/admin");
+      navigate("/admin/dashboard");
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Signup failed. Try again.");
@@ -50,35 +50,46 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full font-sans">
+    // overflow-hidden handles laptop scrolling
+    <div className="flex h-screen w-full overflow-hidden font-sans">
       
-      {/* LEFT SIDE - Branding (Hidden on mobile) */}
-      <div className="hidden lg:flex w-1/2 bg-[#0e2a27] text-white p-16 flex-col justify-center relative">
-        <div className="max-w-md">
-          <h1 className="text-4xl font-serif font-bold leading-tight">
+      {/* LEFT SIDE - Branding */}
+      <div className="hidden lg:flex w-1/2 bg-[#0e2a27] text-white p-16 flex-col justify-center items-center  relative">
+        <div className="max-w-lg">
+          <h1 className="text-4xl text-center font-serif font-bold leading-tight mb-6">
             Apexiums <span className="text-[#20b295]">Management Softwares</span>
           </h1>
-          <p className="mt-8 text-lg text-gray-300">
-            We deals in all kind of management softwares.
+          
+          <p className="text-lg text-gray-300 leading-relaxed mb-8">
+            We deals in all kind or management software. We are here to help you to make your business full digitilize. Be a part of us and expand your business globally.
           </p>
-          <div className="mt-4 flex items-center gap-2 text-xl font-semibold">
-            <span>Contact us :</span>
-            <span className="text-white text-lg">03405542097</span>
+
+          <div className="space-y-4">
+            <div className="inline-block bg-[#20b295]/20 border border-[#20b295] px-6 py-2 rounded-full text-[#20b295] font-bold text-xl uppercase tracking-wider">
+              Book A free demo
+            </div>
+            
+            <p className="text-2xl font-semibold flex gap-3">
+              Contact us :- <span className="text-white">03405542097</span>
+            </p>
           </div>
 
-          <div className="mt-16 pt-8 border-t border-gray-700">
-            <p className="text-md font-medium">
-              Collaborate with us and make your business digital
+          <div className="mt-16">
+            <p className="text-sm text-gray-400 tracking-widest uppercase">
+              A project of Apexiums Technologies
             </p>
           </div>
         </div>
 
-        {/* Floating WhatsApp Button */}
-        <div className="absolute bottom-10 left-16 bg-[#25D366] p-3 rounded-full shadow-lg cursor-pointer hover:scale-110 transition-transform">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.148-.67-1.613-.918-2.213-.242-.588-.487-.51-.67-.51h-.576c-.207 0-.543.078-.827.388-.283.31-1.08 1.055-1.08 2.572 0 1.517 1.102 2.984 1.25 3.183.149.199 2.169 3.31 5.253 4.643.733.315 1.305.504 1.75.647.736.23 1.405.197 1.933.118.588-.088 1.758-.718 2.01-1.411.25-.694.25-1.287.175-1.411-.075-.123-.277-.197-.573-.347z"/>
-          </svg>
-        </div>
+        {/* Floating WhatsApp Icon */}
+        <a 
+          href="https://wa.me/923405542097" 
+          target="_blank" 
+          rel="noreferrer"
+          className="absolute bottom-10 right-10 bg-[#25D366] p-4 rounded-full shadow-2xl cursor-pointer hover:scale-110 transition-transform flex items-center justify-center"
+        >
+          <MessageCircle size={32} fill="white" className="text-[#25D366]" />
+        </a>
       </div>
 
       {/* RIGHT SIDE - Form */}
@@ -101,7 +112,7 @@ const SignUp = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Username
+                Username / Email
               </label>
               <input
                 type="text"
@@ -135,16 +146,11 @@ const SignUp = () => {
             <button
               disabled={signUpResult.isPending}
               type="submit"
-              className="w-full bg-[#20b295] hover:bg-[#1a947c] text-white font-bold py-3 px-4 rounded-lg shadow-lg transform transition-all active:scale-95 disabled:opacity-70"
+              className="w-full bg-[#20b295] hover:bg-[#1a947c] text-white font-bold py-3 px-4 rounded-lg shadow-xl transform transition-all active:scale-95 disabled:opacity-70"
             >
-              {signUpResult.isPending ? "Processing..." : "Log in"}
+              {signUpResult.isPending ? "Connecting..." : "Log in"}
             </button>
           </form>
-
-          {/* Footer Branding for Mobile */}
-          <p className="mt-10 text-center lg:hidden text-gray-500 text-sm">
-            © 2024 Apexiums Management Softwares
-          </p>
         </div>
       </div>
     </div>
