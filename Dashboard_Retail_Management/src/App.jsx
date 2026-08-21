@@ -27,6 +27,7 @@ import StockAttendence from './pages/Stock-Attendence.jsx';
 import Biling from './pages/Biling.jsx';
 import Revenue from './pages/Revenue.jsx';
 import Scanner from './pages/Scanner.jsx';
+import StoreManagement from './pages/store.jsx';
 
 const App = () => {
   const location = useLocation();
@@ -78,6 +79,7 @@ const App = () => {
           <Route path='/admin/billing' element={user ? <Biling />:  <Navigate to='/admin/signin' />}/>
           <Route path='/admin/revenue' element={user ? <Revenue />:  <Navigate to='/admin/signin' />}/>
           <Route path='/admin/scanner' element={user ? <Scanner />:  <Navigate to='/admin/signin' />}/>
+          <Route path='/admin/store' element={user ? <StoreManagement />:  <Navigate to='/admin/signin' />}/>
 
           {/* Fallback route - Sirf galat URL par chalega */}
           <Route path='*' element={user ? <Navigate to='/admin/dashboard' /> : <Navigate to='/admin/signUp' />} />
