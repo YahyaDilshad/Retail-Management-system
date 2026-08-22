@@ -93,22 +93,28 @@ const useauthstore = create(
 
 
       // ✅ Logout
-      logout: async () => {
-        try {
-          await axiosInstance.post("/auth/logout");
-          set({
-             authuser: null,
-             isAuthenticated: false 
-            }); 
-          toast.success(" Logged out successfully");
-        } catch (error) {
-          toast.error(
-            error.response?.data?.message ||
-              error.message ||
-              "Logout failed"
-          );
-        }
-      },
+logout: async () => {
+  try {
+    await axiosInstance.post("/auth/logout");
+
+    localStorage.removeItem("activeStore");
+
+    set({
+      authuser: null,
+      isAuthenticated: false,
+    });
+
+    toast.success("Logged out successfully");
+
+    window.location.href = "/admin/signUp";
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+      error.message ||
+      "Logout failed"
+    );
+  }
+},
     }),
     {
       name: "auth-storage", // localStorage key
