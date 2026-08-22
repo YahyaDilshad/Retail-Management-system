@@ -2,7 +2,7 @@ import React from 'react'
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
-import { Loader } from 'lucide-react'; // Loader icon
+import { Loader } from 'lucide-react'; 
 import 'react-toastify/dist/ReactToastify.css'; 
 
 import axiosInstance from './lib/axios.js';
@@ -31,7 +31,8 @@ import MessageCenter from './pages/messageCenter.jsx';
 const App = () => {
   const location = useLocation();
 
-  const { data: authData, isLoading } = useQuery({
+  // 1. Admin Auth Check (Backend se)
+  const { data: authData, isLoading: isAdminLoading } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       try {
@@ -44,34 +45,44 @@ const App = () => {
     retry: false,
   });
 
-  const user = authData?.user || authData;
+  // 2. Store Auth Check (Frontend LocalStorage se)
+  const storeUser = JSON.parse(localStorage.getItem("activeStore"));
 
-  // 1. Agar check ho raha hai to loading dikhao
-  if (isLoading) {
+  // Unified User: Ya to Admin ho ya Store Owner
+  const adminUser = authData?.user || authData;
+  const user = adminUser || storeUser;
+
+  // Loading state sirf Admin check ke liye zaroori hai
+  if (isAdminLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-gray-50">
-        <Loader className="animate-spin text-[#13786E]" size={40} />
+      <div className="h-screen w-full flex items-center justify-center bg-gray-50 text-[#13786E]">
+        <div className='flex flex-col items-center gap-4'>
+           <Loader className="animate-spin" size={50} />
+           <p className='font-bold uppercase tracking-widest text-xs'>Checking Authentication...</p>
+        </div>
       </div>
     );
   }
 
-  // Sidebar sirf tab dikhao jab user login ho AUR signup page par na ho
-  const showSidebarAndHeader = user && !["/admin/signUp", "/admin/signin"].includes(location.pathname);
+  // Sidebar aur Header dikhane ki condition
+  const isAuthPage = ["/admin/signUp", "/admin/signin"].includes(location.pathname);
+  const showSidebarAndHeader = user && !isAuthPage;
 
   return (
     <div className='relative flex min-h-screen bg-gray-50'>
       <ToastContainer position="top-right" autoClose={3000} /> 
       
+      {/* Sidebar logic: adminUser ya storeUser hone par nazar ayega */}
       {showSidebarAndHeader && <Sidebar />}
 
       <main className={`flex-1 ${showSidebarAndHeader ? "ml-0" : ""}`}>
         {showSidebarAndHeader && <Header />}
         
         <Routes>
-          {/* Auth Route */}
+          {/* Public Auth Route */}
           <Route path='/admin/signUp' element={!user ? <SignUp /> : <Navigate to='/admin/dashboard' />} />
 
-          {/* Protected Routes - Redirect to /admin/signUp if not logged in */}
+          {/* Protected Routes - Inme se koi bhi user (Admin/Store) enter ho sakta hai */}
           <Route path='/admin/dashboard' element={user ? <Dashboard /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/products' element={user ? <ProductPage /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/all-users' element={user ? <Users /> : <Navigate to='/admin/signUp' />} />
@@ -88,6 +99,11 @@ const App = () => {
           <Route path='/admin/scanner' element={user ? <Scanner /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/store' element={user ? <StoreManagement /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/messages' element={user ? <MessageCenter /> : <Navigate to='/admin/signUp' />} />
+          
+          {/* Additional Store Specific Routes (Jo aapne pehle list kiye thay) */}
+          <Route path='/admin/orders' element={user ? <div className='p-10 ml-64 mt-14 font-bold'>Orders Page</div> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/debt' element={user ? <div className='p-10 ml-64 mt-14 font-bold'>Debt Page</div> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/customers' element={user ? <div className='p-10 ml-64 mt-14 font-bold'>Customers Page</div> : <Navigate to='/admin/signUp' />} />
           
           {/* Fallback route */}
           <Route path='*' element={user ? <Navigate to='/admin/dashboard' /> : <Navigate to='/admin/signUp' />} />
