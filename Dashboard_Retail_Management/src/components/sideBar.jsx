@@ -47,7 +47,7 @@ const Sidebar = () => {
     { label: "Messages", icon: <MessageSquare size={20} />, to: "/admin/messages" },
     { label: "Expense", icon: <TrendingDown size={20} />, to: "/admin/expense" },
     { label: "Revenue", icon: <TrendingUp size={20} />, to: "/admin/revenue" },
-    { label: "Platinum Customers", icon: <Crown size={20} />, to: "/admin/platinum-customers" },
+    { label: "Customer Status", icon: <Crown size={20} />, to: "/admin/customerstatus" },
   ];
 
   // --- STORE LINKS (Grouped for better look) ---
@@ -64,9 +64,7 @@ const Sidebar = () => {
       group: "Inventory",
       links: [
         { label: "Products", icon: <Package size={18} />, to: "/admin/products" },
-        { label: "Categories", icon: <Grid2X2 size={18} />, to: "/admin/categories" },
-        { label: "Stocks", icon: <Boxes size={18} />, to: "/admin/stock" },
-      ]
+        { label: "Categories", icon: <Grid2X2 size={18} />, to: "/admin/categories" },      ]
     },
     {
       group: "Sales & Orders",

@@ -1,186 +1,158 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
-  MessageSquare, 
-  Send, 
-  Users, 
-  User, 
-  Search, 
-  CheckCircle,
-  Clock,
-  Trash2
+  MessageSquare, Send, Users, User, Search, Clock, Trash2, Loader
 } from "lucide-react";
 import { toast } from "react-toastify";
+import axiosInstance from "../lib/axios";
 
 const MessageCenter = () => {
-  // Dummy Stores (Aap isay apne Store state se bhi connect kar sakte hain)
-  const [stores] = useState([
-    { id: 1, name: "Apexiums Central", owner: "Ali Ahmed" },
-    { id: 2, name: "Apexiums North", owner: "Hamza Khan" },
-    { id: 3, name: "Apexiums West", owner: "Sana Malik" },
-    { id: 4, name: "Apexiums Mart", owner: "Zeeshan" },
-  ]);
-
-  const [selectedRecipient, setSelectedRecipient] = useState("all"); // "all" or specific store ID
+  const [stores, setStores] = useState([]);
+  const [sentMessages, setSentMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedRecipient, setSelectedRecipient] = useState("all");
   const [messageText, setMessageText] = useState("");
-  const [sentMessages, setSentMessages] = useState([
-    { id: 1, to: "All Stores", text: "Welcome to Apexiums Management!", time: "10:00 AM", type: "broadcast" }
-  ]);
 
-  // Handle Send Message
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-
-    if (!messageText.trim()) {
-      return toast.error("Please type a message first");
+  // --- 1. FETCH DATA (Stores and History) ---
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [storesRes, historyRes] = await Promise.all([
+        axiosInstance.get("/stores/all"),
+        axiosInstance.get("/messages/history")
+      ]);
+      setStores(storesRes.data);
+      setSentMessages(historyRes.data);
+    } catch (error) {
+      toast.error("Failed to sync with server");
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    const recipientName = selectedRecipient === "all" 
-      ? "All Stores" 
-      : stores.find(s => s.id === parseInt(selectedRecipient))?.name;
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    const newMessage = {
-      id: Date.now(),
-      to: recipientName,
+  // --- 2. SEND MESSAGE LOGIC ---
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!messageText.trim()) return toast.error("Please type a message");
+
+    const recipientStore = stores.find(s => s._id === selectedRecipient);
+    
+    const payload = {
+      recipient: selectedRecipient, // "all" or ID
+      recipientName: selectedRecipient === "all" ? "All Stores" : recipientStore?.name,
       text: messageText,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       type: selectedRecipient === "all" ? "broadcast" : "individual"
     };
 
-    // Update Local State (Simulation)
-    setSentMessages([newMessage, ...sentMessages]);
-    
-    // Reset Form
-    setMessageText("");
-    toast.success(selectedRecipient === "all" ? "Broadcast message sent to all stores!" : `Message sent to ${recipientName}`);
+    try {
+      const res = await axiosInstance.post("/messages/send", payload);
+      setSentMessages([res.data, ...sentMessages]);
+      setMessageText("");
+      toast.success(selectedRecipient === "all" ? "Broadcast Sent!" : "Message Sent!");
+    } catch (error) {
+      toast.error("Failed to send message");
+    }
   };
 
-  const deleteHistory = (id) => {
-    setSentMessages(sentMessages.filter(m => m.id !== id));
+  // --- 3. DELETE HISTORY ---
+  const deleteHistory = async (id) => {
+    try {
+      await axiosInstance.delete(`/messages/delete/${id}`);
+      setSentMessages(sentMessages.filter(m => m._id !== id));
+      toast.info("Record removed");
+    } catch (error) {
+      toast.error("Delete failed");
+    }
   };
 
   return (
-    <div className="flex-1 ml-64 min-h-screen bg-[#F8FAFC] p-8 mt-14">
-      
-      {/* Header */}
+    <div className="flex-1 ml-64 min-h-screen bg-[#F8FAFC] p-8 mt-14 text-left">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-          <MessageSquare className="text-[#13786E]" /> Message Center
+        <h1 className="text-3xl font-black text-[#13786E] tracking-tighter uppercase italic flex items-center gap-3">
+          <MessageSquare /> Global Message Center
         </h1>
-        <p className="text-gray-500">Send updates or announcements to your retail outlets.</p>
+        <p className="text-gray-400 text-[10px] font-bold tracking-[3px] uppercase">
+            {isLoading ? "Syncing..." : "Real-time communication active"}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Column: Composer Form */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* Left Column: Form */}
+        <div className="lg:col-span-2">
           <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
             <form onSubmit={handleSendMessage} className="space-y-6">
-              
-              {/* Recipient Selector */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Send Message To:</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block ml-1">Select Audience</label>
                 <div className="grid grid-cols-2 gap-4">
                   <button
                     type="button"
                     onClick={() => setSelectedRecipient("all")}
-                    className={`flex items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+                    className={`flex items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all font-bold ${
                       selectedRecipient === "all" 
                       ? "border-[#13786E] bg-teal-50 text-[#13786E]" 
-                      : "border-gray-100 bg-gray-50 text-gray-500"
+                      : "border-gray-100 bg-gray-50 text-gray-400"
                     }`}
                   >
-                    <Users size={20} />
-                    <span className="font-bold">All Stores</span>
+                    <Users size={20} /> ALL STORES
                   </button>
                   
-                  <div className="relative">
-                    <select
-                      value={selectedRecipient !== "all" ? selectedRecipient : ""}
-                      onChange={(e) => setSelectedRecipient(e.target.value)}
-                      className={`w-full h-full p-4 pl-10 rounded-2xl border-2 outline-none transition-all appearance-none ${
-                        selectedRecipient !== "all" 
-                        ? "border-[#13786E] bg-teal-50 text-[#13786E]" 
-                        : "border-gray-100 bg-gray-50 text-gray-500"
-                      }`}
-                    >
-                      <option value="" disabled>Select Specific Store</option>
-                      {stores.map(store => (
-                        <option key={store.id} value={store.id}>{store.name}</option>
-                      ))}
-                    </select>
-                    <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2" />
-                  </div>
+                  <select
+                    value={selectedRecipient !== "all" ? selectedRecipient : ""}
+                    onChange={(e) => setSelectedRecipient(e.target.value)}
+                    className="p-4 rounded-2xl border-2 border-gray-100 bg-gray-50 outline-none text-sm font-bold text-gray-500"
+                  >
+                    <option value="" disabled>Select Specific Store</option>
+                    {stores.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                  </select>
                 </div>
               </div>
 
-              {/* Message Input */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Your Message:</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block ml-1">Message Content</label>
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  placeholder="Type your announcement or message here..."
-                  className="w-full h-44 p-5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-[#13786E] outline-none transition-all bg-gray-50 resize-none"
+                  placeholder="Enter announcement text..."
+                  className="w-full h-40 p-5 rounded-3xl border border-gray-200 outline-none bg-gray-50 focus:ring-2 focus:ring-[#13786E] transition-all font-medium"
                 />
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-[#13786E] hover:bg-[#0e5a52] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-teal-900/20 transition-all active:scale-95"
-              >
-                <Send size={20} /> {selectedRecipient === "all" ? "Broadcast to All Stores" : "Send Private Message"}
+              <button type="submit" className="w-full bg-[#13786E] text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                <Send size={18} /> {selectedRecipient === "all" ? "Broadcast Bulk Message" : "Send Individual Message"}
               </button>
             </form>
           </div>
         </div>
 
-        {/* Right Column: Sent History */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 h-[600px] flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-gray-50 bg-gray-50/50">
-              <h2 className="font-bold text-gray-800 flex items-center gap-2 text-lg">
-                <Clock size={18} className="text-[#13786E]" /> Recent Activity
-              </h2>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-              {sentMessages.map((msg) => (
-                <div key={msg.id} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 relative group">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
-                      msg.type === 'broadcast' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
-                    }`}>
-                      {msg.type}
-                    </span>
-                    <button 
-                      onClick={() => deleteHistory(msg.id)}
-                      className="text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                  <p className="text-xs font-bold text-gray-500 mb-1">To: {msg.to}</p>
-                  <p className="text-sm text-gray-700 line-clamp-3">{msg.text}</p>
-                  <p className="text-[10px] text-gray-400 mt-2 text-right">{msg.time}</p>
+        {/* Right Column: History */}
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 h-[600px] flex flex-col overflow-hidden">
+          <div className="p-6 border-b bg-gray-50/50">
+            <h2 className="font-black text-[10px] text-gray-500 uppercase tracking-widest flex items-center gap-2">
+              <Clock size={16} className="text-[#13786E]" /> Recent Log
+            </h2>
+          </div>
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {sentMessages.map((msg) => (
+              <div key={msg._id} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 relative group">
+                <div className="flex justify-between items-center mb-2">
+                  <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${
+                    msg.type === 'broadcast' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
+                  }`}>
+                    {msg.type}
+                  </span>
+                  <button onClick={() => deleteHistory(msg._id)} className="opacity-0 group-hover:opacity-100 text-red-400 transition-opacity"><Trash2 size={14}/></button>
                 </div>
-              ))}
-
-              {sentMessages.length === 0 && (
-                <div className="text-center py-10">
-                  <MessageSquare size={40} className="mx-auto text-gray-200 mb-2" />
-                  <p className="text-gray-400 text-sm italic">No messages sent yet.</p>
-                </div>
-              )}
-            </div>
+                <p className="text-[10px] font-black text-[#13786E] uppercase">To: {msg.recipientName}</p>
+                <p className="text-sm text-gray-700 mt-1">{msg.text}</p>
+                <p className="text-[9px] text-gray-400 mt-2 font-bold">{msg.createdAt}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-      `}</style>
     </div>
   );
 };

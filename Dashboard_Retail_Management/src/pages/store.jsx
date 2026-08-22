@@ -1,48 +1,42 @@
-import React, { useState, useEffect } from "react"; // useEffect add kiya
+import React, { useState, useEffect } from "react";
 import { 
   Store, Plus, Edit2, Trash2, MapPin, Search, X, 
   User, Tag, Phone, Mail, DollarSign, Calendar 
 } from "lucide-react";
 import { toast } from "react-toastify";
+import axiosInstance from "../lib/axios"; // Aapka purana axios instance use kiya hai
 
 const StoreManagement = () => {
-  // --- 1. LOCAL STORAGE LOGIC ---
-  // Initial state load karne ka tareeka: Check if data exists in localStorage
-  const [stores, setStores] = useState(() => {
-    const savedStores = localStorage.getItem("apex_stores_list");
-    return savedStores ? JSON.parse(savedStores) : [
-      { 
-          id: 1, 
-          name: "Apexiums Central", 
-          owner: "Ali Ahmed",
-          address: "Gulberg III, Lahore", 
-          shopType: "Retail Mart",
-          contact: "0300-1234567",
-          email: "central@apex.com",
-          monthlyRent: "55,000",
-          createdAt: "2024-01-15",
-          status: "Active" 
-      }
-    ];
-  });
-
-  // Jab bhi 'stores' change hon, unhe localStorage mein save karo
-  useEffect(() => {
-    localStorage.setItem("apex_stores_list", JSON.stringify(stores));
-  }, [stores]);
-  // ------------------------------
-
+  const [stores, setStores] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   
   const emptyStore = { 
-    id: null, name: "", owner: "", address: "", shopType: "", 
+    name: "", owner: "", address: "", shopType: "", 
     contact: "", email: "", monthlyRent: "", 
     createdAt: new Date().toISOString().split('T')[0], 
     status: "Active" 
   };
 
   const [currentStore, setCurrentStore] = useState(emptyStore);
+
+  // --- 1. FETCH STORES FROM BACKEND ---
+  const fetchStores = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axiosInstance.get("/stores/all");
+      setStores(res.data);
+    } catch (error) {
+      toast.error("Failed to load stores");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStores();
+  }, []);
 
   const handleChange = (e) => {
     setCurrentStore({ ...currentStore, [e.target.name]: e.target.value });
@@ -53,30 +47,42 @@ const StoreManagement = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  // --- 2. ADD OR UPDATE LOGIC ---
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentStore.name || !currentStore.owner || !currentStore.contact) {
       toast.error("Please fill required fields");
       return;
     }
 
-    if (currentStore.id) {
-      // Edit logic: LocalStorage useEffect ki wajah se khud update ho jayega
-      setStores(stores.map((s) => (s.id === currentStore.id ? currentStore : s)));
-      toast.success("Store updated successfully");
-    } else {
-      // Add logic: New store created
-      const newStore = { ...currentStore, id: Date.now() };
-      setStores([...stores, newStore]);
-      toast.success("New store created successfully");
+    try {
+      if (currentStore._id) {
+        // Update Logic (PUT)
+        const res = await axiosInstance.put(`/stores/update/${currentStore._id}`, currentStore);
+        setStores(stores.map((s) => (s._id === currentStore._id ? res.data : s)));
+        toast.success("Store updated successfully");
+      } else {
+        // Add Logic (POST)
+        const res = await axiosInstance.post("/stores/add", currentStore);
+        setStores([res.data, ...stores]);
+        toast.success("New store created successfully");
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Operation failed");
     }
-    setIsModalOpen(false);
   };
 
-  const deleteStore = (id) => {
+  // --- 3. DELETE LOGIC ---
+  const deleteStore = async (id) => {
     if (window.confirm("Are you sure you want to delete this store?")) {
-      setStores(stores.filter((s) => s.id !== id));
-      toast.info("Store removed");
+      try {
+        await axiosInstance.delete(`/stores/delete/${id}`);
+        setStores(stores.filter((s) => s._id !== id));
+        toast.info("Store removed");
+      } catch (error) {
+        toast.error("Failed to delete store");
+      }
     }
   };
 
@@ -87,11 +93,12 @@ const StoreManagement = () => {
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen mt-14 ml-64 font-sans">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-8 text-left">
         <div>
           <h1 className="text-3xl font-black text-[#13786E] tracking-tighter uppercase">Store Management</h1>
-          <p className="text-gray-400 text-xs font-bold tracking-widest">PERSISTENT DATA STORAGE ENABLED</p>
+          <p className="text-gray-400 text-xs font-bold tracking-widest uppercase">
+            {isLoading ? "Fetching data from server..." : "Live Cloud Database Enabled"}
+          </p>
         </div>
         <button
           onClick={() => openModal()}
@@ -101,7 +108,6 @@ const StoreManagement = () => {
         </button>
       </div>
 
-      {/* Search Bar */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-3">
         <Search className="text-gray-400" size={20} />
         <input
@@ -113,9 +119,8 @@ const StoreManagement = () => {
         />
       </div>
 
-      {/* Stores Table */}
       <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto text-left">
           <table className="w-full text-left">
             <thead className="bg-gray-100 border-b border-gray-200">
               <tr>
@@ -130,7 +135,7 @@ const StoreManagement = () => {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredStores.map((store) => (
-                <tr key={store.id} className="hover:bg-teal-50/40 transition-colors">
+                <tr key={store._id} className="hover:bg-teal-50/40 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
                       <span className="font-bold text-gray-800 text-sm">{store.name}</span>
@@ -144,16 +149,12 @@ const StoreManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded border border-gray-200 text-gray-500">
-                        {store.email}
-                    </span>
+                    <span className="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded border border-gray-200 text-gray-500">{store.email}</span>
                   </td>
                   <td className="px-6 py-4">
                     <span className="font-black text-[#13786E] text-sm">Rs. {store.monthlyRent}</span>
                   </td>
-                  <td className="px-6 py-4 text-[11px] text-gray-500 font-bold">
-                    {store.createdAt}
-                  </td>
+                  <td className="px-6 py-4 text-[11px] text-gray-500 font-bold">{store.createdAt}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter ${
                         store.status === "Active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
@@ -163,8 +164,8 @@ const StoreManagement = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-center gap-2">
-                      <button onClick={() => openModal(store)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><Edit2 size={16} /></button>
-                      <button onClick={() => deleteStore(store.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                      <button onClick={() => openModal(store)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-all"><Edit2 size={16} /></button>
+                      <button onClick={() => deleteStore(store._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -174,16 +175,15 @@ const StoreManagement = () => {
         </div>
       </div>
 
-      {/* Modal with Grid Layout */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-[#13786E] p-6 flex justify-between items-center text-white">
-              <h2 className="text-xl font-black uppercase tracking-widest">{currentStore.id ? "Update Store" : "New Registration"}</h2>
+              <h2 className="text-xl font-black uppercase tracking-widest">{currentStore._id ? "Update Store" : "New Registration"}</h2>
               <button onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
                 <FormInput label="Store Name" name="name" icon={<Store size={16}/>} value={currentStore.name} onChange={handleChange} />
                 <FormInput label="Owner Name" name="owner" icon={<User size={16}/>} value={currentStore.owner} onChange={handleChange} />
                 <div className="md:col-span-2">

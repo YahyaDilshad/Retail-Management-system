@@ -27,6 +27,11 @@ import Revenue from './pages/Revenue.jsx';
 import Scanner from './pages/Scanner.jsx';
 import StoreManagement from './pages/store.jsx';
 import MessageCenter from './pages/messageCenter.jsx';
+import RentManagement from './pages/Rent.jsx';
+import ExpenseManagement from './pages/expense.jsx';
+import CustomerStatus from './pages/customerStatus.jsx';
+import Orders from './pages/Orders.jsx';
+import Customers from './pages/CustomerPage.jsx';
 
 const App = () => {
   const location = useLocation();
@@ -99,11 +104,14 @@ const App = () => {
           <Route path='/admin/scanner' element={user ? <Scanner /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/store' element={user ? <StoreManagement /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/messages' element={user ? <MessageCenter /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/rent' element={user ? <RentManagement /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/expense' element={user ? <ExpenseManagement /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/customerstatus' element={user ? <CustomerStatus /> : <Navigate to='/admin/signUp' />} />
           
           {/* Additional Store Specific Routes (Jo aapne pehle list kiye thay) */}
-          <Route path='/admin/orders' element={user ? <div className='p-10 ml-64 mt-14 font-bold'>Orders Page</div> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/orders' element={user ? <Orders/> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/debt' element={user ? <div className='p-10 ml-64 mt-14 font-bold'>Debt Page</div> : <Navigate to='/admin/signUp' />} />
-          <Route path='/admin/customers' element={user ? <div className='p-10 ml-64 mt-14 font-bold'>Customers Page</div> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/customers' element={user ? <Customers/> : <Navigate to='/admin/signUp' />} />
           
           {/* Fallback route */}
           <Route path='*' element={user ? <Navigate to='/admin/dashboard' /> : <Navigate to='/admin/signUp' />} />

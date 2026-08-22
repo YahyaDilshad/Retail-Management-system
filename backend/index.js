@@ -11,17 +11,23 @@ import brandRoutes from "./router/brandRoute.js";
 import productRoutes from "./router/productRoute.js";
 import authuser from "./router/userRouter.js";
 import staff from "./router/Staff.router.js";
+import storeRouter from "./router/storeRouter.js"
+import rentRouter from "./router/rentRouter.js"
+import messageRouter from "./router/messageRouter.js"
+import expenseRouter from "./router/expenseRouter.js"
+import revenueRouter from "./router/revenuerouter.js"
+import customerRouter from "./router/customerRoute.js"
 const app = express();
 
 app.use(cookieParser());
-app.use(cors({
-  origin : "https://retail-management-system-imno.vercel.app",
-  credentials : true
-}))
-  // app.use(cors({
-  //   origin: "http://localhost:5173",
-  //   credentials : true
-  // }))
+// app.use(cors({
+//   origin : "https://retail-management-system-imno.vercel.app",
+//   credentials : true
+// }))
+  app.use(cors({
+    origin: "http://localhost:5173",
+    credentials : true
+  }))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -35,6 +41,13 @@ app.use("/api/products", productRoutes);
 app.use("/api/staff", staff);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/brands", brandRoutes);
+app.use("/api/stores", storeRouter);
+app.use("/api/rent", rentRouter);
+app.use("/api/messages", messageRouter);
+app.use("/api/expenses", expenseRouter);
+app.use("/api/revenue", revenueRouter);
+app.use("/api/customers", customerRouter);
+
 // global error handler
 app.use((err, req, res, next) => {
   console.error(err);
