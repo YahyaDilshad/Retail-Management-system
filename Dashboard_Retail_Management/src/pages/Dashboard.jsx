@@ -32,7 +32,7 @@ const Dashboard = () => {
     },
     {
       label: "Total Revenue",
-      count: "Rs. $54,230.00",
+      count: "Rs. 54,230.00",
       icon: <TrendingUp size={28} />, 
       to: "/admin/revenue",
       color: "#10B981", 

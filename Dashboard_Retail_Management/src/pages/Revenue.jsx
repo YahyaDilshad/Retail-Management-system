@@ -70,7 +70,7 @@ const Revenue = () => {
           icon={<DollarSign size={24}/>} 
         />
         <StatCard 
-          title="Avg. Order Value" 
+          title="Avg. STORE RENT" 
           amount={`Rs. ${stats?.avgOrderValue}`} 
           percentage="-2.4%" 
           isUp={false} 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Award, Plus, Edit2, Trash2, Search, X, 
-  User, Phone, DollarSign, Calendar, Star, Loader
+  User, Phone, DollarSign, Calendar, AlertTriangle, Loader // AlertTriangle icon add kiya defaulter ke liye
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosInstance from "../lib/axios";
@@ -17,7 +17,6 @@ const CustomerStatus = () => {
   };
   const [currentCustomer, setCurrentCustomer] = useState(emptyCustomer);
 
-  // --- 1. FETCH CUSTOMERS FROM BACKEND ---
   const fetchCustomers = async () => {
     setIsLoading(true);
     try {
@@ -38,7 +37,6 @@ const CustomerStatus = () => {
     setCurrentCustomer({ ...currentCustomer, [e.target.name]: e.target.value });
   };
 
-  // --- 2. ADD OR UPDATE LOGIC ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentCustomer.name || !currentCustomer.contact || !currentCustomer.totalSpent) {
@@ -53,7 +51,7 @@ const CustomerStatus = () => {
       } else {
         const res = await axiosInstance.post("/customers/add", currentCustomer);
         setCustomers([res.data, ...customers]);
-        toast.success("New customer status added");
+        toast.success("New customer added");
       }
       setIsModalOpen(false);
     } catch (error) {
@@ -61,7 +59,6 @@ const CustomerStatus = () => {
     }
   };
 
-  // --- 3. DELETE LOGIC ---
   const deleteCustomer = async (id) => {
     if (window.confirm("Remove this customer from status list?")) {
       try {
@@ -79,11 +76,13 @@ const CustomerStatus = () => {
     c.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // --- FIXED: Color logic and added Defaulter color (Red) ---
   const getStatusColor = (status) => {
-    switch (status) {
-      case "Platinum": return "bg-blue-100 text-blue-700 border-blue-200";
-      case "VIP": return "bg-purple-100 text-purple-700 border-purple-200";
-      case "Gold": return "bg-orange-100 text-orange-700 border-orange-200";
+    const s = status?.toLowerCase(); // Case sensitivity fix
+    switch (s) {
+      case "platinum": return "bg-blue-100 text-blue-700 border-blue-200";
+      case "defaulter": return "bg-red-100 text-red-700 border-red-200"; // Red for danger
+      case "gold": return "bg-orange-100 text-orange-700 border-orange-200";
       default: return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
@@ -96,7 +95,7 @@ const CustomerStatus = () => {
         <div>
           <h1 className="text-3xl font-black text-[#13786E] tracking-tighter uppercase italic">Customer Status</h1>
           <p className="text-gray-400 text-[10px] font-bold tracking-[3px] mt-1 uppercase">
-            {isLoading ? "Syncing..." : "Live Loyalty Tracking"}
+            {isLoading ? "Syncing..." : "Live Loyalty & Warning Tracking"}
           </p>
         </div>
         <button
@@ -107,7 +106,7 @@ const CustomerStatus = () => {
         </button>
       </div>
 
-      {/* Stats */}
+      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
           <div className="bg-blue-50 p-3 rounded-xl text-blue-500 shadow-inner"><Award size={24}/></div>
@@ -116,12 +115,14 @@ const CustomerStatus = () => {
             <h3 className="text-xl font-black">{customers.length}</h3>
           </div>
         </div>
+        
+        {/* --- FIXED: Stats for Platinum and Defaulters --- */}
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="bg-purple-50 p-3 rounded-xl text-purple-500 shadow-inner"><Star size={24}/></div>
+          <div className="bg-red-50 p-3 rounded-xl text-red-500 shadow-inner"><AlertTriangle size={24}/></div>
           <div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">VIP/Platinum</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Defaulters List</p>
             <h3 className="text-xl font-black">
-              {customers.filter(c => c.status === 'Platinum' || c.status === 'VIP').length}
+              {customers.filter(c => c.status?.toLowerCase() === 'defaulter').length}
             </h3>
           </div>
         </div>
@@ -132,7 +133,7 @@ const CustomerStatus = () => {
         <Search className="text-gray-400" size={20} />
         <input
           type="text"
-          placeholder="Search by name or status..."
+          placeholder="Search by name or status (defaulter, gold...)"
           className="w-full outline-none bg-transparent font-medium"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -203,7 +204,7 @@ const CustomerStatus = () => {
                     <option value="Silver">Silver</option>
                     <option value="Gold">Gold</option>
                     <option value="Platinum">Platinum</option>
-                    <option value="VIP">VIP</option>
+                    <option value="defaulter">defaulter</option>
                   </select>
                 </div>
                 <div className="space-y-1">

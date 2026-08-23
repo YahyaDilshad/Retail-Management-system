@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { 
   Store, Plus, Edit2, Trash2, MapPin, Search, X, 
-  User, Tag, Phone, Mail, DollarSign, Calendar 
+  User, Tag, Phone, Mail, DollarSign, Calendar, Lock, Eye, EyeOff 
 } from "lucide-react";
 import { toast } from "react-toastify";
-import axiosInstance from "../lib/axios"; // Aapka purana axios instance use kiya hai
+import axiosInstance from "../lib/axios";
 
 const StoreManagement = () => {
   const [stores, setStores] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showPass, setShowPass] = useState(false); // Password hide/show toggle
   
   const emptyStore = { 
     name: "", owner: "", address: "", shopType: "", 
-    contact: "", email: "", monthlyRent: "", 
+    contact: "", email: "", password: "", // Naya field add kiya
+    monthlyRent: "", 
     createdAt: new Date().toISOString().split('T')[0], 
     status: "Active" 
   };
 
   const [currentStore, setCurrentStore] = useState(emptyStore);
 
-  // --- 1. FETCH STORES FROM BACKEND ---
   const fetchStores = async () => {
     setIsLoading(true);
     try {
@@ -47,22 +48,19 @@ const StoreManagement = () => {
     setIsModalOpen(true);
   };
 
-  // --- 2. ADD OR UPDATE LOGIC ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!currentStore.name || !currentStore.owner || !currentStore.contact) {
-      toast.error("Please fill required fields");
+    if (!currentStore.name || !currentStore.owner || !currentStore.contact || !currentStore.password) {
+      toast.error("Please fill all required fields (including Password)");
       return;
     }
 
     try {
       if (currentStore._id) {
-        // Update Logic (PUT)
         const res = await axiosInstance.put(`/stores/update/${currentStore._id}`, currentStore);
         setStores(stores.map((s) => (s._id === currentStore._id ? res.data : s)));
         toast.success("Store updated successfully");
       } else {
-        // Add Logic (POST)
         const res = await axiosInstance.post("/stores/add", currentStore);
         setStores([res.data, ...stores]);
         toast.success("New store created successfully");
@@ -73,7 +71,6 @@ const StoreManagement = () => {
     }
   };
 
-  // --- 3. DELETE LOGIC ---
   const deleteStore = async (id) => {
     if (window.confirm("Are you sure you want to delete this store?")) {
       try {
@@ -92,12 +89,12 @@ const StoreManagement = () => {
   );
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen mt-14 ml-64 font-sans">
-      <div className="flex justify-between items-center mb-8 text-left">
+    <div className="p-8 bg-gray-50 min-h-screen mt-14 ml-64 font-sans text-left">
+      <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-black text-[#13786E] tracking-tighter uppercase">Store Management</h1>
+          <h1 className="text-3xl font-black text-[#13786E] tracking-tighter uppercase italic">Store Management</h1>
           <p className="text-gray-400 text-xs font-bold tracking-widest uppercase">
-            {isLoading ? "Fetching data from server..." : "Live Cloud Database Enabled"}
+            {isLoading ? "Syncing..." : "Control Panel for Retail Partners"}
           </p>
         </div>
         <button
@@ -120,20 +117,19 @@ const StoreManagement = () => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
-        <div className="overflow-x-auto text-left">
+        <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-gray-100 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Store / Owner</th>
                 <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Type / Contact</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Login</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Login Info</th>
                 <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Rent</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Reg. Date</th>
                 <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Status</th>
                 <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 font-medium">
               {filteredStores.map((store) => (
                 <tr key={store._id} className="hover:bg-teal-50/40 transition-colors">
                   <td className="px-6 py-4">
@@ -142,19 +138,19 @@ const StoreManagement = () => {
                       <span className="text-[11px] text-teal-600 font-bold uppercase">{store.owner}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-xs">
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-gray-700">{store.shopType}</span>
-                      <span className="text-[11px] text-gray-400 font-medium">{store.contact}</span>
+                      <span className="font-bold text-gray-700">{store.shopType}</span>
+                      <span className="text-gray-400 font-medium">{store.contact}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded border border-gray-200 text-gray-500">{store.email}</span>
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-gray-500 lowercase underline">{store.email}</span>
+                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">PASS: ••••••••</span>
+                    </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="font-black text-[#13786E] text-sm">Rs. {store.monthlyRent}</span>
-                  </td>
-                  <td className="px-6 py-4 text-[11px] text-gray-500 font-bold">{store.createdAt}</td>
+                  <td className="px-6 py-4 font-black text-[#13786E] text-sm">Rs. {store.monthlyRent}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter ${
                         store.status === "Active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
@@ -164,8 +160,8 @@ const StoreManagement = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-center gap-2">
-                      <button onClick={() => openModal(store)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-all"><Edit2 size={16} /></button>
-                      <button onClick={() => deleteStore(store._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16} /></button>
+                      <button onClick={() => openModal(store)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><Edit2 size={16} /></button>
+                      <button onClick={() => deleteStore(store._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -177,13 +173,13 @@ const StoreManagement = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-[2.5rem]  w-full max-w-2xl shadow-2xl overflow-auto animate-in zoom-in duration-200">
             <div className="bg-[#13786E] p-6 flex justify-between items-center text-white">
-              <h2 className="text-xl font-black uppercase tracking-widest">{currentStore._id ? "Update Store" : "New Registration"}</h2>
+              <h2 className="text-xl font-black uppercase tracking-widest">{currentStore._id ? "Edit Store" : "Register New Store"}</h2>
               <button onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <FormInput label="Store Name" name="name" icon={<Store size={16}/>} value={currentStore.name} onChange={handleChange} />
                 <FormInput label="Owner Name" name="owner" icon={<User size={16}/>} value={currentStore.owner} onChange={handleChange} />
                 <div className="md:col-span-2">
@@ -191,13 +187,30 @@ const StoreManagement = () => {
                 </div>
                 <FormInput label="Shop Type" name="shopType" icon={<Tag size={16}/>} value={currentStore.shopType} onChange={handleChange} />
                 <FormInput label="Contact Number" name="contact" icon={<Phone size={16}/>} value={currentStore.contact} onChange={handleChange} />
+                
+                {/* Authentication Section */}
                 <FormInput label="Login Email" name="email" type="email" icon={<Mail size={16}/>} value={currentStore.email} onChange={handleChange} />
+                <div className="relative">
+                    <FormInput 
+                      label="Store Login Password" name="password" 
+                      type={showPass ? "text" : "password"} 
+                      icon={<Lock size={16}/>} value={currentStore.password} 
+                      onChange={handleChange} 
+                    />
+                    <button 
+                        type="button" onClick={() => setShowPass(!showPass)}
+                        className="absolute right-3 top-[34px] text-gray-400 hover:text-teal-600 transition-colors"
+                    >
+                        {showPass ? <EyeOff size={16}/> : <Eye size={16}/>}
+                    </button>
+                </div>
+
                 <FormInput label="Monthly Rent (Rs)" name="monthlyRent" type="number" icon={<DollarSign size={16}/>} value={currentStore.monthlyRent} onChange={handleChange} />
                 <FormInput label="Creation Date" name="createdAt" type="date" icon={<Calendar size={16}/>} value={currentStore.createdAt} onChange={handleChange} />
               </div>
               <div className="pt-8 flex gap-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-3 border border-gray-300 rounded-xl font-bold text-gray-400 uppercase text-xs">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-3 bg-[#13786E] text-white rounded-xl font-bold shadow-lg uppercase text-xs tracking-widest">Save Store Data</button>
+                <button type="submit" className="flex-1 px-4 py-3 bg-[#13786E] text-white rounded-xl font-bold shadow-lg uppercase text-xs tracking-widest shadow-teal-900/20 transition-all active:scale-95">Save Store Details</button>
               </div>
             </form>
           </div>

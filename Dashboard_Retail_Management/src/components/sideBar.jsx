@@ -138,8 +138,8 @@ const Sidebar = () => {
         {/* Administrator Link (Always at bottom of list) */}
         <div className="mt-4 pt-4 border-t border-teal-800">
           <SidebarLink 
-            link={{ label: "Administrator", icon: <ShieldCheck size={20} />, to: "/admin/administrator" }} 
-            active={isActive("/admin/administrator")} 
+            link={{ label: "Administrator", icon: <ShieldCheck size={20} />, to: "/admin/settings" }} 
+            active={isActive("/admin/settings")} 
           />
         </div>
       </nav>
