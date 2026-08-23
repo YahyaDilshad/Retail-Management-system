@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { 
   Store, Plus, Edit2, Trash2, MapPin, Search, X, 
-  User, Tag, Phone, Mail, DollarSign, Calendar, Lock, Eye, EyeOff 
+  User, Tag, Phone, Mail, DollarSign, Calendar, Lock, Eye, EyeOff,
+  Power // Power icon for status feel
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosInstance from "../lib/axios";
@@ -11,11 +12,11 @@ const StoreManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showPass, setShowPass] = useState(false); // Password hide/show toggle
+  const [showPass, setShowPass] = useState(false);
   
   const emptyStore = { 
     name: "", owner: "", address: "", shopType: "", 
-    contact: "", email: "", password: "", // Naya field add kiya
+    contact: "", email: "", password: "", 
     monthlyRent: "", 
     createdAt: new Date().toISOString().split('T')[0], 
     status: "Active" 
@@ -39,6 +40,23 @@ const StoreManagement = () => {
     fetchStores();
   }, []);
 
+  // --- NEW: TOGGLE STATUS FUNCTION ---
+  const toggleStatus = async (id, currentStatus) => {
+    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+    try {
+      // Backend ko sirf status update bhej rahe hain
+      await axiosInstance.put(`/stores/update/${id}`, { status: newStatus });
+      
+      // UI update bina refresh kiye
+      setStores(stores.map(s => s._id === id ? { ...s, status: newStatus } : s));
+      
+      if(newStatus === "Active") toast.success("Store Activated");
+      else toast.warn("Store Inactivated");
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
+  };
+
   const handleChange = (e) => {
     setCurrentStore({ ...currentStore, [e.target.name]: e.target.value });
   };
@@ -51,7 +69,7 @@ const StoreManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentStore.name || !currentStore.owner || !currentStore.contact || !currentStore.password) {
-      toast.error("Please fill all required fields (including Password)");
+      toast.error("Please fill all required fields");
       return;
     }
 
@@ -109,24 +127,23 @@ const StoreManagement = () => {
         <Search className="text-gray-400" size={20} />
         <input
           type="text"
-          placeholder="Search by store or owner..."
+          placeholder="Search stores..."
           className="w-full outline-none text-gray-700 bg-transparent font-medium"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+      <div className="bg-white rounded-[2rem] shadow-md overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-gray-100 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Store / Owner</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Type / Contact</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Login Info</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Rent</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest">Status</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase text-gray-500 tracking-widest text-center">Actions</th>
+                <th className="px-6 py-5 text-[10px] font-black uppercase text-gray-500 tracking-widest">Store / Owner</th>
+                <th className="px-6 py-5 text-[10px] font-black uppercase text-gray-500 tracking-widest">Type / Contact</th>
+                <th className="px-6 py-5 text-[10px] font-black uppercase text-gray-500 tracking-widest">Login Info</th>
+                <th className="px-6 py-5 text-[10px] font-black uppercase text-gray-500 tracking-widest text-center">Status Control</th>
+                <th className="px-6 py-5 text-[10px] font-black uppercase text-gray-500 tracking-widest text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 font-medium">
@@ -150,15 +167,29 @@ const StoreManagement = () => {
                         <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">PASS: ••••••••</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-black text-[#13786E] text-sm">Rs. {store.monthlyRent}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter ${
-                        store.status === "Active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                    }`}>
+
+                  {/* --- UPDATED STATUS TOGGLE COLUMN --- */}
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex flex-col items-center gap-1">
+                      <button
+                        onClick={() => toggleStatus(store._id, store.status)}
+                        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-all duration-300 focus:outline-none shadow-inner ${
+                          store.status === "Active" ? "bg-[#13786E]" : "bg-gray-300"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-all duration-300 ${
+                            store.status === "Active" ? "translate-x-7" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
+                      <span className={`text-[8px] font-black uppercase tracking-tighter ${store.status === 'Active' ? 'text-teal-600' : 'text-gray-400'}`}>
                         {store.status}
-                    </span>
+                      </span>
+                    </div>
                   </td>
-                  <td className="px-6 py-4">
+
+                  <td className="px-6 py-4 text-center">
                     <div className="flex justify-center gap-2">
                       <button onClick={() => openModal(store)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"><Edit2 size={16} /></button>
                       <button onClick={() => deleteStore(store._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
@@ -171,9 +202,10 @@ const StoreManagement = () => {
         </div>
       </div>
 
+      {/* Modal is same as before, no changes needed there */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2.5rem]  w-full max-w-2xl shadow-2xl overflow-auto animate-in zoom-in duration-200">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-2xl shadow-2xl overflow-auto animate-in zoom-in duration-200">
             <div className="bg-[#13786E] p-6 flex justify-between items-center text-white">
               <h2 className="text-xl font-black uppercase tracking-widest">{currentStore._id ? "Edit Store" : "Register New Store"}</h2>
               <button onClick={() => setIsModalOpen(false)}><X size={24} /></button>
@@ -188,7 +220,6 @@ const StoreManagement = () => {
                 <FormInput label="Shop Type" name="shopType" icon={<Tag size={16}/>} value={currentStore.shopType} onChange={handleChange} />
                 <FormInput label="Contact Number" name="contact" icon={<Phone size={16}/>} value={currentStore.contact} onChange={handleChange} />
                 
-                {/* Authentication Section */}
                 <FormInput label="Login Email" name="email" type="email" icon={<Mail size={16}/>} value={currentStore.email} onChange={handleChange} />
                 <div className="relative">
                     <FormInput 
