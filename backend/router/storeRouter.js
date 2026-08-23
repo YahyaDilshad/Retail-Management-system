@@ -10,6 +10,7 @@ const Store = mongoose.model("Store", new mongoose.Schema({
   shopType: { type: String },
   contact: { type: String, required: true },
   email: { type: String },
+  password: { type: String, required: true }, // Ye line lazmi add karein
   monthlyRent: { type: Number },
   createdAt: { type: String },
   status: { type: String, default: "Active" }
