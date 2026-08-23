@@ -32,6 +32,7 @@ import ExpenseManagement from './pages/expense.jsx';
 import CustomerStatus from './pages/customerStatus.jsx';
 import Orders from './pages/Orders.jsx';
 import Customers from './pages/CustomerPage.jsx';
+import Profile from './pages/profile.jsx';
 
 const App = () => {
   const location = useLocation();
@@ -107,6 +108,7 @@ const App = () => {
           <Route path='/admin/rent' element={user ? <RentManagement /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/expense' element={user ? <ExpenseManagement /> : <Navigate to='/admin/signUp' />} />
           <Route path='/admin/customerstatus' element={user ? <CustomerStatus /> : <Navigate to='/admin/signUp' />} />
+          <Route path='/admin/profile' element={user ? <Profile /> : <Navigate to='/admin/signUp' />} />
           
           {/* Additional Store Specific Routes (Jo aapne pehle list kiye thay) */}
           <Route path='/admin/orders' element={user ? <Orders/> : <Navigate to='/admin/signUp' />} />
