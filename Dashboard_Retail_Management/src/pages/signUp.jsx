@@ -69,6 +69,7 @@ const SignUp = () => {
       {/* LEFT SIDE - Branding Content */}
       <div className="hidden lg:flex w-1/2 bg-[#0e2a27] text-white p-8 lg:p-12 flex-col justify-center items-center relative text-center">
         <div className="max-w-md animate-in fade-in zoom-in duration-700">
+          <p className="pb-3">وَاَوْفُوا الْكَيْلَ اِذَا كِلْتُمْ وَزِنُوْا بِالْقِسْطَاسِ الْمُسْتَقِيْمِ</p>
           <h1 className="text-3xl lg:text-4xl font-serif font-bold leading-tight mb-4">
             Apexiums Retail<br />
             <span className="text-[#20b295]">Management Softwares</span>
@@ -78,10 +79,7 @@ const SignUp = () => {
             "We deals in all kind or management software. We are here to help you to make your business full digitilize."
           </p>
 
-          <div className="space-y-4">
-            <div className="inline-block bg-[#20b295]/20 border border-[#20b295] px-6 py-2 rounded-full text-[#20b295] font-black text-lg uppercase tracking-wider">
-              Book A free demo
-            </div>
+          
             
             <div className="flex flex-col items-center gap-1">
                <p className="text-gray-400 text-[10px] uppercase font-bold tracking-widest">Contact us</p>
@@ -90,7 +88,10 @@ const SignUp = () => {
                </p>
             </div>
           </div>
-
+         <div className="space-y-4">
+            <div className="inline-block bg-[#20b295]/20 border border-[#20b295] px-6 py-2 my-5 rounded-full text-[#20b295] font-black text-lg uppercase tracking-wider">
+              Book A free demo
+            </div>
           <div className="mt-10 lg:mt-16 border-t border-white/5 pt-6">
             <p className="text-[13px] text-teal-100/40 font-bold tracking-[3px] uppercase">
               A project of Apexiums Technologies
