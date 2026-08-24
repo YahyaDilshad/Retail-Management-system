@@ -69,7 +69,7 @@ const SignUp = () => {
       {/* LEFT SIDE - Branding Content */}
       <div className="hidden lg:flex w-1/2 bg-[#0e2a27] text-white p-8 lg:p-12 flex-col justify-center items-center relative text-center">
         <div className="max-w-md animate-in fade-in zoom-in duration-700">
-          <p className="pb-6">وَاَوْفُوا الْكَيْلَ اِذَا كِلْتُمْ وَزِنُوْا بِالْقِسْطَاسِ الْمُسْتَقِيْمِ</p>
+          <p className="mb-13">وَاَوْفُوا الْكَيْلَ اِذَا كِلْتُمْ وَزِنُوْا بِالْقِسْطَاسِ الْمُسْتَقِيْمِ</p>
           <h1 className="text-3xl lg:text-4xl font-serif font-bold leading-tight mb-4">
             Apexiums Retail<br />
             <span className="text-[#20b295]">Management Softwares</span>
