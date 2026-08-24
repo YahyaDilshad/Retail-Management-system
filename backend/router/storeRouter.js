@@ -18,7 +18,7 @@ const Store = mongoose.models.Store || mongoose.model("Store", new mongoose.Sche
 }));
  
 // --- NEW: STORE LOGIN API ---
-router.post("/login",protect , async (req, res) => {
+router.post("/login", async (req, res) => {
   const { name, password } = req.body;
   
   try {
