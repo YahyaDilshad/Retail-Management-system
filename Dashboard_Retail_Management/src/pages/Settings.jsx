@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { 
-  Lock, ShieldCheck, Eye, EyeOff, Save, RefreshCw, AlertCircle 
+  Lock, ShieldCheck, Eye, EyeOff, Save, RefreshCw, AlertCircle, Loader2 
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosInstance from "../lib/axios";
@@ -32,15 +32,12 @@ const Settings = () => {
 
     setIsLoading(true);
     try {
-      // Backend Route: /auth/change-password
       await axiosInstance.put("/auth/change-password", {
         oldPassword: securityData.oldPassword,
         newPassword: securityData.newPassword
       });
       
       toast.success("Security credentials updated successfully!");
-      
-      // Form reset
       setSecurityData({ oldPassword: "", newPassword: "", confirmPassword: "" });
     } catch (error) {
       toast.error(error.response?.data?.message || "Password change failed");
@@ -50,31 +47,31 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex-1 ml-64 min-h-screen bg-[#F8FAFC] p-8 mt-16 text-left font-sans">
+    <div className="flex-1 lg:ml-64 ml-0 min-h-screen bg-[#F8FAFC] p-4 md:p-8 mt-16 text-left font-sans overflow-x-hidden">
       
-      {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-black text-gray-800 tracking-tighter uppercase italic flex items-center gap-3">
-          <Lock size={32} className="text-[#13786E]" /> Account Security
+      {/* Header - Centered on Mobile */}
+      <div className="mb-8 md:mb-10 text-center md:text-left">
+        <h1 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tighter uppercase italic flex items-center justify-center md:justify-start gap-3">
+          <Lock size={32} className="text-[#13786E] hidden sm:block" /> Account Security
         </h1>
-        <p className="text-gray-400 text-[10px] font-bold tracking-[3px] uppercase mt-1">
+        <p className="text-gray-400 text-[9px] md:text-[10px] font-bold tracking-[2px] md:tracking-[3px] uppercase mt-1">
           Update your administrative access key
         </p>
       </div>
 
       <div className="max-w-2xl mx-auto lg:mx-0">
-        <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm p-10 relative overflow-hidden">
+        <div className="bg-white border border-gray-100 rounded-[2rem] md:rounded-[2.5rem] shadow-sm p-6 md:p-10 relative overflow-hidden">
           
-          {/* Decorative Background Icon */}
-          <ShieldCheck size={150} className="absolute -right-10 -bottom-10 text-teal-50 opacity-50" />
+          {/* Decorative Background Icon - Hidden on very small screens to avoid clutter */}
+          <ShieldCheck size={150} className="absolute -right-10 -bottom-10 text-teal-50 opacity-50 hidden sm:block" />
 
           <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="bg-teal-50 p-3 rounded-2xl text-[#13786E]">
-                 <ShieldCheck size={24} />
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-8 text-center sm:text-left">
+              <div className="bg-teal-50 p-4 rounded-2xl text-[#13786E] shadow-inner">
+                 <ShieldCheck size={28} />
               </div>
               <div>
-                <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">Security Credentials</h2>
+                <h2 className="text-lg md:text-xl font-black text-gray-800 uppercase tracking-tight">Security Credentials</h2>
                 <p className="text-[10px] text-gray-400 font-bold uppercase">Ensure your account stays protected</p>
               </div>
             </div>
@@ -87,24 +84,24 @@ const Settings = () => {
                 <div className="relative">
                   <input 
                     type={showPass.old ? "text" : "password"} 
-                    placeholder="Enter your current password"
+                    placeholder="Enter current password"
                     value={securityData.oldPassword}
                     onChange={(e) => setSecurityData({...securityData, oldPassword: e.target.value})}
-                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-[#13786E] text-sm font-bold text-gray-700 transition-all"
+                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-[#13786E] text-sm font-bold text-gray-700 transition-all shadow-inner"
                   />
                   <button 
                     type="button" 
                     onClick={() => setShowPass({...showPass, old: !showPass.old})}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-teal-600"
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#13786E] transition-colors"
                   >
                     {showPass.old ? <EyeOff size={18}/> : <Eye size={18}/>}
                   </button>
                 </div>
               </div>
 
-              {/* New Password */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-50">
-                <div className="space-y-2 relative">
+              {/* New Password Grid - Stacks on Mobile */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 pt-6 border-t border-gray-50">
+                <div className="space-y-2">
                   <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">New Password</label>
                   <div className="relative">
                     <input 
@@ -112,12 +109,12 @@ const Settings = () => {
                       placeholder="••••••••"
                       value={securityData.newPassword}
                       onChange={(e) => setSecurityData({...securityData, newPassword: e.target.value})}
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-[#13786E] text-sm font-bold text-gray-700 transition-all"
+                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-[#13786E] text-sm font-bold text-gray-700 transition-all shadow-inner"
                     />
                     <button 
                       type="button" 
                       onClick={() => setShowPass({...showPass, new: !showPass.new})}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400"
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#13786E]"
                     >
                       {showPass.new ? <EyeOff size={18}/> : <Eye size={18}/>}
                     </button>
@@ -131,28 +128,29 @@ const Settings = () => {
                     placeholder="••••••••"
                     value={securityData.confirmPassword}
                     onChange={(e) => setSecurityData({...securityData, confirmPassword: e.target.value})}
-                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-[#13786E] text-sm font-bold text-gray-700 transition-all"
+                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-[#13786E] text-sm font-bold text-gray-700 transition-all shadow-inner"
                   />
                 </div>
               </div>
 
-              {/* Tips Section */}
+              {/* Security Alert Section */}
               <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 flex items-start gap-3 mt-4">
-                 <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
-                 <p className="text-[10px] text-amber-700 font-medium leading-relaxed">
-                   Admin, changing your password will not log you out, but please make sure to remember your new credentials for the next session.
+                 <AlertCircle size={20} className="text-amber-500 shrink-0 mt-0.5" />
+                 <p className="text-[10px] md:text-[11px] text-amber-700 font-bold leading-relaxed uppercase tracking-tight">
+                   Attention: Changing your password will require you to re-authenticate on all other active devices. 
+                   Ensure your new password is secure and private.
                  </p>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button - Full width on mobile */}
               <div className="pt-6">
                 <button 
                   type="submit" 
                   disabled={isLoading}
-                  className="w-full md:w-auto px-12 py-4 bg-[#13786E] text-white rounded-2xl font-black uppercase text-[11px] tracking-[2px] shadow-xl shadow-teal-900/20 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70"
+                  className="w-full md:w-auto px-12 py-4 bg-[#13786E] text-white rounded-2xl font-black uppercase text-[10px] tracking-[2px] shadow-xl shadow-teal-900/20 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70 hover:bg-teal-700"
                 >
-                  {isLoading ? <RefreshCw className="animate-spin" size={18}/> : <Save size={18}/>}
-                  {isLoading ? "Updating..." : "Confirm & Update Password"}
+                  {isLoading ? <Loader2 className="animate-spin" size={18}/> : <Save size={18}/>}
+                  {isLoading ? "Synchronizing..." : "Confirm & Update Key"}
                 </button>
               </div>
 
@@ -160,6 +158,14 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer Info */}
+      <div className="mt-12 text-center border-t border-gray-100 pt-6">
+         <p className="text-[9px] font-black text-gray-300 uppercase tracking-[4px]">
+            End-to-End Encryption Enabled • Apexiums v2.0
+         </p>
+      </div>
+
     </div>
   );
 };

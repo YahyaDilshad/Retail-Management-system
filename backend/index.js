@@ -17,6 +17,9 @@ import messageRouter from "./router/messageRouter.js"
 import expenseRouter from "./router/expenseRouter.js"
 import revenueRouter from "./router/revenuerouter.js"
 import customerRouter from "./router/customerRoute.js"
+import agencyRouter from "./router/agency.touter.js"
+import Dashboard from "./router/Dashboard.js"
+import dabitRouter from "./router/dabitRoute.js"
 const app = express();
 
 app.use(cookieParser());
@@ -47,7 +50,9 @@ app.use("/api/messages", messageRouter);
 app.use("/api/expenses", expenseRouter);
 app.use("/api/revenue", revenueRouter);
 app.use("/api/customers", customerRouter);
-
+app.use("/api/agencies", agencyRouter );
+app.use("/api/debts", dabitRouter );
+app.use("/api/dashboard" , Dashboard )
 // global error handler
 app.use((err, req, res, next) => {
   console.error(err);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { 
-  MessageSquare, Send, Users, User, Search, Clock, Trash2, Loader
+  MessageSquare, Send, Users, Clock, Trash2, Loader2, X, CheckCircle 
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axiosInstance from "../lib/axios";
@@ -20,10 +20,12 @@ const MessageCenter = () => {
         axiosInstance.get("/stores/all"),
         axiosInstance.get("/messages/history")
       ]);
-      setStores(storesRes.data);
-      setSentMessages(historyRes.data);
+      
+      setStores(storesRes.data.data || storesRes.data || []);
+      setSentMessages(historyRes.data.data || historyRes.data || []);
     } catch (error) {
-      toast.error("Failed to sync with server");
+      console.error("Fetch Error:", error);
+      toast.error("Failed to sync communication data");
     } finally {
       setIsLoading(false);
     }
@@ -41,7 +43,7 @@ const MessageCenter = () => {
     const recipientStore = stores.find(s => s._id === selectedRecipient);
     
     const payload = {
-      recipient: selectedRecipient, // "all" or ID
+      recipient: selectedRecipient,
       recipientName: selectedRecipient === "all" ? "All Stores" : recipientStore?.name,
       text: messageText,
       type: selectedRecipient === "all" ? "broadcast" : "individual"
@@ -49,110 +51,164 @@ const MessageCenter = () => {
 
     try {
       const res = await axiosInstance.post("/messages/send", payload);
-      setSentMessages([res.data, ...sentMessages]);
+      const newMessage = res.data.data || res.data;
+      setSentMessages([newMessage, ...sentMessages]);
       setMessageText("");
       toast.success(selectedRecipient === "all" ? "Broadcast Sent!" : "Message Sent!");
     } catch (error) {
-      toast.error("Failed to send message");
+      toast.error("Failed to transmit message");
     }
   };
 
   // --- 3. DELETE HISTORY ---
   const deleteHistory = async (id) => {
-    try {
-      await axiosInstance.delete(`/messages/delete/${id}`);
-      setSentMessages(sentMessages.filter(m => m._id !== id));
-      toast.info("Record removed");
-    } catch (error) {
-      toast.error("Delete failed");
+    if (window.confirm("Remove this log entry?")) {
+      try {
+        await axiosInstance.delete(`/messages/delete/${id}`);
+        setSentMessages((prev) => prev.filter(m => m._id !== id));
+        toast.info("Log removed");
+      } catch (error) {
+        toast.error("Delete operation failed");
+      }
     }
   };
 
   return (
-    <div className="flex-1 ml-64 min-h-screen bg-[#F8FAFC] p-8 mt-14 text-left">
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-[#13786E] tracking-tighter uppercase italic flex items-center gap-3">
-          <MessageSquare /> Global Message Center
+    <div className="flex-1 lg:ml-64 ml-0 min-h-screen bg-[#F8FAFC] p-4 md:p-8 mt-14 text-left font-sans text-gray-800 overflow-x-hidden">
+      
+      {/* Page Header */}
+      <div className="mb-8 text-center md:text-left">
+        <h1 className="text-2xl md:text-3xl font-black text-[#13786E] tracking-tighter uppercase italic flex items-center justify-center md:justify-start gap-3">
+          <MessageSquare className="hidden sm:block" /> Message Center
         </h1>
-        <p className="text-gray-400 text-[10px] font-bold tracking-[3px] uppercase">
-            {isLoading ? "Syncing..." : "Real-time communication active"}
+        <p className="text-gray-400 text-[10px] font-bold tracking-[3px] uppercase mt-1">
+            {isLoading ? "Synchronizing..." : "End-to-End Encrypted Terminal"}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Form */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        
+        {/* LEFT COLUMN: Message Composer */}
         <div className="lg:col-span-2">
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+          <div className="bg-white p-5 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 h-full">
             <form onSubmit={handleSendMessage} className="space-y-6">
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block ml-1">Select Audience</label>
-                <div className="grid grid-cols-2 gap-4">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block ml-1">
+                    1. Target Audience
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                   <button
                     type="button"
                     onClick={() => setSelectedRecipient("all")}
-                    className={`flex items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all font-bold ${
+                    className={`flex items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all font-black text-xs uppercase tracking-widest active:scale-95 ${
                       selectedRecipient === "all" 
-                      ? "border-[#13786E] bg-teal-50 text-[#13786E]" 
-                      : "border-gray-100 bg-gray-50 text-gray-400"
+                      ? "border-[#13786E] bg-teal-50 text-[#13786E] shadow-sm" 
+                      : "border-gray-50 bg-gray-50 text-gray-400"
                     }`}
                   >
-                    <Users size={20} /> ALL STORES
+                    <Users size={18} /> Broadcast ALL
                   </button>
                   
                   <select
                     value={selectedRecipient !== "all" ? selectedRecipient : ""}
                     onChange={(e) => setSelectedRecipient(e.target.value)}
-                    className="p-4 rounded-2xl border-2 border-gray-100 bg-gray-50 outline-none text-sm font-bold text-gray-500"
+                    className="p-4 rounded-2xl border-2 border-gray-50 bg-gray-50 outline-none text-xs font-bold text-gray-600 focus:border-[#13786E] transition-all cursor-pointer shadow-inner"
                   >
-                    <option value="" disabled>Select Specific Store</option>
+                    <option value="" disabled>Select Store...</option>
                     {stores.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block ml-1">Message Content</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block ml-1">
+                    2. Content Body
+                </label>
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  placeholder="Enter announcement text..."
-                  className="w-full h-40 p-5 rounded-3xl border border-gray-200 outline-none bg-gray-50 focus:ring-2 focus:ring-[#13786E] transition-all font-medium"
+                  placeholder="Type your announcement or alert here..."
+                  className="w-full h-48 md:h-64 p-5 rounded-3xl border border-gray-100 outline-none bg-gray-50/50 focus:ring-2 focus:ring-[#13786E]/20 focus:bg-white transition-all font-medium text-sm shadow-inner"
                 />
               </div>
 
-              <button type="submit" className="w-full bg-[#13786E] text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 shadow-lg active:scale-95">
-                <Send size={18} /> {selectedRecipient === "all" ? "Broadcast Bulk Message" : "Send Individual Message"}
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full bg-[#13786E] text-white py-4 md:py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all hover:bg-teal-700"
+              >
+                {selectedRecipient === "all" ? <Users size={18}/> : <Send size={18} />} 
+                {selectedRecipient === "all" ? "Execute Broadcast Bulk" : "Transmit Individual Signal"}
               </button>
             </form>
           </div>
         </div>
 
-        {/* Right Column: History */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 h-[600px] flex flex-col overflow-hidden">
-          <div className="p-6 border-b bg-gray-50/50">
-            <h2 className="font-black text-[10px] text-gray-500 uppercase tracking-widest flex items-center gap-2">
+        {/* RIGHT COLUMN: Real-time History Log */}
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 h-[500px] lg:h-auto flex flex-col overflow-hidden">
+          <div className="p-6 border-b bg-gray-50/50 flex justify-between items-center">
+            <h2 className="font-black text-[10px] text-gray-400 uppercase tracking-widest flex items-center gap-2">
               <Clock size={16} className="text-[#13786E]" /> Recent Log
             </h2>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           </div>
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {sentMessages.map((msg) => (
-              <div key={msg._id} className="p-4 rounded-2xl bg-gray-50 border border-gray-100 relative group">
-                <div className="flex justify-between items-center mb-2">
-                  <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md ${
-                    msg.type === 'broadcast' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
-                  }`}>
-                    {msg.type}
-                  </span>
-                  <button onClick={() => deleteHistory(msg._id)} className="opacity-0 group-hover:opacity-100 text-red-400 transition-opacity"><Trash2 size={14}/></button>
+          
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 custom-scrollbar">
+            {isLoading ? (
+               <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-300">
+                  <Loader2 className="animate-spin" size={24}/>
+                  <span className="text-[9px] font-black uppercase">Loading Log...</span>
+               </div>
+            ) : sentMessages.length === 0 ? (
+               <div className="flex flex-col items-center justify-center h-full text-gray-300 opacity-50 italic">
+                  <span className="text-[10px] font-black uppercase">No outgoing logs</span>
+               </div>
+            ) : (
+              sentMessages.map((msg) => (
+                <div key={msg._id} className="p-4 rounded-2xl bg-gray-50/50 border border-gray-100 relative group transition-all hover:bg-white hover:shadow-md">
+                  <div className="flex justify-between items-start mb-3">
+                    <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md border ${
+                      msg.type === 'broadcast' 
+                      ? 'bg-purple-50 text-purple-600 border-purple-100' 
+                      : 'bg-blue-50 text-blue-600 border-blue-100'
+                    }`}>
+                      {msg.type}
+                    </span>
+                    <button 
+                        onClick={() => deleteHistory(msg._id)} 
+                        className="p-1 md:opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all bg-white rounded-lg shadow-sm border"
+                    >
+                        <Trash2 size={12}/>
+                    </button>
+                  </div>
+                  
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[9px] font-black text-[#13786E] uppercase tracking-tighter flex items-center gap-1">
+                        To: <span className="text-gray-800">{msg.recipientName}</span>
+                    </p>
+                    <p className="text-xs md:text-sm text-gray-600 font-medium leading-relaxed mt-1">
+                        {msg.text}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                     <p className="text-[8px] text-gray-400 font-bold italic">
+                        {new Date(msg.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                     </p>
+                     <CheckCircle size={10} className="text-teal-500"/>
+                  </div>
                 </div>
-                <p className="text-[10px] font-black text-[#13786E] uppercase">To: {msg.recipientName}</p>
-                <p className="text-sm text-gray-700 mt-1">{msg.text}</p>
-                <p className="text-[9px] text-gray-400 mt-2 font-bold">{msg.createdAt}</p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #F1F5F9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      `}</style>
     </div>
   );
 };

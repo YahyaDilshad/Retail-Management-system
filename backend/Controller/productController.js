@@ -4,65 +4,65 @@ import { createproduct } from "../services/product.service.js";
 import { Brand } from "../models/brand.model.js";
 import mongoose from "mongoose";
 
-export const createProduct = async (req, res)=>{
-      try {
-        const { Name, Price, brandName , Stock, Discount, Description } = req.body;
-      // Validation
-        if (!Name || Price == null || !brandName ) {
-          return res.status(400).json({
-            success: false,
-            message: "Missing required fields (name, price, brandId)",
-          });
-        }
-        const existingProduct = await Product.findOne({ Name });
+export const createProduct = async (req, res) => {
+  try {
+    // 1. categoryId ko bhi nikaalein req.body se
+    const { Name, Price, brandName, companyPrice , categoryId, Stock, Discount, Description } = req.body;
 
-          if (existingProduct) {
-            return res.status(409).json({
-              message: "Product already exists"
-            });
-          }
-        const fetchExistingBrand = await Brand.findOne({ brandName });
-         if(!fetchExistingBrand) return res.status(309).send("Cannot Fetch brand")
-        // Upload image if available
-        let imageUrl = "";
-          if (req.file) {
-            try {
-              const uploadRes = await uploadToCloudinary(req.file);
-              imageUrl = uploadRes?.url || "";
-            } catch (uploadErr) {
-              return res.status(500).json({
-                success: false,
-                message: "Failed to upload image to Cloudinary",
-                error: uploadErr.message,
-              });
-            }
-        }
-        const product = await createproduct({
-          Name,
-          Price,
-          brandId : fetchExistingBrand._id,
-          Stock,
-          brandName : fetchExistingBrand.brandName, 
-          Discount,
-          Description,
-          Image: imageUrl || "",
-        });
-       console.log("Product data send to service" , product)
-       res.status(201).json({
-       success: true,
-       message: "Product created successfully",
-       data: product
+    // Validation
+    if (!Name || Price == null || !brandName || !categoryId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields (Name, Price, Brand, or Category)",
       });
-      } catch (error) {
-        console.error("Error creating product:", error);
-        res.status(500).json({
-          success: false,
-          message: "Server error while creating product",
-          error: error.message,
-        });
-
     }
-}
+
+    const existingProduct = await Product.findOne({ Name });
+    if (existingProduct) {
+      return res.status(409).json({ message: "Product already exists" });
+    }
+
+    const fetchExistingBrand = await Brand.findOne({ brandName });
+    if (!fetchExistingBrand) return res.status(309).send("Cannot Fetch brand");
+
+    let imageUrl = "";
+    if (req.file) {
+      try {
+        const uploadRes = await uploadToCloudinary(req.file);
+        imageUrl = uploadRes?.url || "";
+      } catch (uploadErr) {
+        return res.status(500).json({
+          success: false,
+          message: "Failed to upload image",
+          error: uploadErr.message,
+        });
+      }
+    }
+
+    // 2. categoryId ko service mein pass karein
+    const product = await createproduct({
+      Name,
+      Price,
+      brandId: fetchExistingBrand._id,
+      categoryId: categoryId, // Pass categoryId here
+      Stock,
+      companyPrice,
+      brandName: fetchExistingBrand.brandName,
+      Discount,
+      Description,
+      Image: imageUrl || "",
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      data: product
+    });
+  } catch (error) {
+    console.error("Error creating product:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
 export const updateProduct = async (req,res)=>{
     try{
         const { id } = req.params;
@@ -116,7 +116,7 @@ export const getAllProducts = async (req, res) => {
     }
 
     const products = await Product.find(filter)
-
+    console.log(products)
     res.json({ success: true, count: products.length, data: products });
   } catch (error) {
     console.error("Error fetching products:", error);

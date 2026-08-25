@@ -9,6 +9,7 @@ export const createproduct = async({
         Discount,
         Description,
         Image,
+        companyPrice,
         brandName
         }) => {
         try {
@@ -18,6 +19,7 @@ export const createproduct = async({
             brandId,
             brandName,
             Stock,
+            companyPrice,
             Discount,
             Description,
             Image

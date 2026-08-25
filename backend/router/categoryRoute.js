@@ -1,61 +1,28 @@
 import express from "express";
 import { Category } from "../models/Category.model.js";
-
-
 const router = express.Router();
 
-// 🔹 CREATE CATEGORY
-router.post("/create", async (req, res) => {
+// 🔹 CREATE CATEGORY (Frontend calls /api/categories/add)
+router.post("/add", async (req, res) => {
   try {
     const { categoryName } = req.body;
-
-    // Validate input
-    if (!categoryName || !categoryName.trim()) {
-      return res.status(400).json({ success: false, message: "Category name is required" });
-    }
-
-    // Check duplicate
-    const existingCategory = await Category.findOne({ categoryName: categoryName.trim() });
-    if (existingCategory) {
-      return res.status(400).json({ success: false, message: "Category already exists" });
-    }
-
-    // Create category
+    if (!categoryName) return res.status(400).json({ success: false, message: "Name required" });
+    
     const category = await Category.create({ categoryName: categoryName.trim() });
-
-    return res.status(201).json({
-      success: true,
-      message: "Category created successfully",
-      category,
-    });
-
+    return res.status(201).json({ success: true, category });
   } catch (err) {
-    console.error("Error creating category:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Server error while creating category",
-      error: err.message,
-    });
+    return res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// 🔹 GET ALL CATEGORIES
-router.get("/", async (req, res) => {
+// 🔹 GET ALL (Frontend calls /api/categories/all)
+router.get("/all", async (req, res) => {
   try {
     const categories = await Category.find().sort({ createdAt: -1 });
-    // latest first
-    return res.status(200).json({
-      success: true,
-      categories,
-    });
+    return res.status(200).json(categories); // Seedha array bhej rahay hain taake frontend hang na ho
   } catch (err) {
-    console.error("Error fetching categories:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Server error while fetching categories",
-      error: err.message,
-    });
+    return res.status(500).json({ message: err.message });
   }
 });
 
-export default router;
+export default router; // Fix: was 'route' before
